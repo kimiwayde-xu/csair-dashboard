@@ -1760,8 +1760,21 @@
         // 当月平台明细
         function initDetailChart() {
             const chart = echarts.init(document.getElementById('detailChart'));
-            const platforms = Object.keys(dashboardData.current_month_platform);
-            const values = Object.values(dashboardData.current_month_platform);
+            
+            // 根据当前选择的月份获取平台数据
+            const monthName = currentMonth + '月';
+            let platformData = {};
+            
+            // 从 monthly_data 中获取当前月份的平台数据
+            if (dashboardData.monthly_data['2026']?.[monthName]?.platform) {
+                platformData = dashboardData.monthly_data['2026'][monthName].platform;
+            } else {
+                // 回退到 current_month_platform
+                platformData = dashboardData.current_month_platform || {};
+            }
+            
+            const platforms = Object.keys(platformData);
+            const values = Object.values(platformData);
 
             const option = {
                 tooltip: {
@@ -1872,12 +1885,20 @@
             document.getElementById('detailTitle').textContent = '📋 ' + monthName + '平台明细';
             document.getElementById('currentMonthTitle').textContent = monthName + '稿件';
             
+            // 更新当月稿件数
+            const monthData = dashboardData.monthly_data[currentYear]?.[monthName];
+            if (monthData) {
+                dashboardData.summary.current_month_articles = monthData.total;
+            }
+            
             updateMetrics();
 
-            // 重新初始化科室同比图表
-            initDeptYoyChart();
+            // 重新初始化所有受月份影响的图表
+            initMonthlyDeptChart();  // 月度科室排名
+            initDeptYoyChart();       // 科室同比
+            initDetailChart();        // 平台明细
 
-            // 更新月度图表高亮当前月份
+            // 更新月度趋势图表高亮当前月份
             const monthlyChart = echarts.getInstanceByDom(document.getElementById('monthlyChart'));
             if (monthlyChart) {
                 monthlyChart.dispatchAction({
