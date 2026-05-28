@@ -330,7 +330,7 @@
                 grid-column: span 1;
                 grid-template-columns: repeat(2, 1fr);
             }
-            .platform-card, .monthly-dept-card, .dept-yoy-card, .detail-card {
+            .platform-card, .monthly-dept-card, .dept-yoy-card {
                 grid-column: span 1;
                 grid-row: span 1;
             }
@@ -418,12 +418,6 @@
         <div class="card dept-yoy-card">
             <div class="card-title" id="deptYoyTitle">📊 5月科室同比</div>
             <div class="chart-container" id="deptYoyChart" style="height: 280px;"></div>
-        </div>
-
-        <!-- 当月详情 -->
-        <div class="card detail-card">
-            <div class="card-title" id="detailTitle">📋 5月平台明细</div>
-            <div class="chart-container" id="detailChart" style="height: 280px;"></div>
         </div>
 
         <!-- 月度趋势对比 -->
@@ -1376,7 +1370,6 @@
             initYearlyDeptChart();
             initMonthlyChart();
             initDeptYoyChart();
-            initDetailChart();
         }
 
         // 平台分布饼图
@@ -1758,7 +1751,6 @@
         }
 
         // 当月平台明细
-        function initDetailChart() {
             const chart = echarts.init(document.getElementById('detailChart'));
             
             // 根据当前选择的月份获取平台数据
@@ -1882,7 +1874,6 @@
             const monthName = currentMonth + '月';
             document.getElementById('monthlyDeptTitle').textContent = '🏆 ' + monthName + '科室稿件排名';
             document.getElementById('deptYoyTitle').textContent = '📊 ' + monthName + '科室同比';
-            document.getElementById('detailTitle').textContent = '📋 ' + monthName + '平台明细';
             document.getElementById('currentMonthTitle').textContent = monthName + '稿件';
             
             // 更新当月稿件数
@@ -1896,7 +1887,6 @@
             // 重新初始化所有受月份影响的图表
             initMonthlyDeptChart();  // 月度科室排名
             initDeptYoyChart();       // 科室同比
-            initDetailChart();        // 平台明细
 
             // 更新月度趋势图表高亮当前月份
             const monthlyChart = echarts.getInstanceByDom(document.getElementById('monthlyChart'));
