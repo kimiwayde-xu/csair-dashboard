@@ -239,11 +239,6 @@
             grid-column: span 2;
         }
 
-        /* 当月明细 */
-        .detail-card {
-            grid-column: span 2;
-        }
-
         /* 月度趋势 - 大卡片 */
         .monthly-card {
             grid-column: span 4;
@@ -417,6 +412,9 @@
         <!-- 科室本月同比 -->
         <div class="card dept-yoy-card">
             <div class="card-title" id="deptYoyTitle">📊 5月科室同比</div>
+            <div class="chart-container" id="deptYoyChart" style="height: 280px;"></div>
+        </div>
+
             <div class="chart-container" id="deptYoyChart" style="height: 280px;"></div>
         </div>
 
@@ -1750,7 +1748,6 @@
             window.addEventListener('resize', () => chart.resize());
         }
 
-        // 当月平台明细
             const chart = echarts.init(document.getElementById('detailChart'));
             
             // 根据当前选择的月份获取平台数据
