@@ -1,0 +1,1883 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026年地服部宣传数据可视化看板</title>
+    <!-- ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <!-- 数字动画 -->
+    <script src="https://cdn.jsdelivr.net/npm/countup.js@2.3.2/dist/countUp.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0a0e17 0%, #141c28 50%, #0a0e17 100%);
+            min-height: 100vh;
+            color: #c8d4e8;
+            overflow-x: hidden;
+        }
+
+        /* 标题区 */
+        .header {
+            background: linear-gradient(90deg, #1a2d4a 0%, #3d6b99 50%, #1a2d4a 100%);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #4a90d9;
+            box-shadow: 0 4px 30px rgba(74, 144, 217, 0.2);
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(74, 144, 217, 0.6);
+            letter-spacing: 4px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .datetime {
+            font-size: 20px;
+            color: #7eb8da;
+            font-weight: 500;
+        }
+
+        /* 控制栏 */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 15px;
+            background: rgba(20, 28, 40, 0.6);
+            border-bottom: 1px solid rgba(74, 144, 217, 0.2);
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-label {
+            color: #8a9cc2;
+            font-size: 16px;
+        }
+
+        select {
+            background: rgba(20, 28, 40, 0.8);
+            border: 1px solid rgba(74, 144, 217, 0.4);
+            color: #7eb8da;
+            padding: 10px 18px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        select:hover {
+            border-color: #7eb8da;
+            box-shadow: 0 0 10px rgba(126, 184, 218, 0.3);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #7eb8da;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #4a90d9, #7eb8da);
+            border: none;
+            color: #fff;
+            padding: 10px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 144, 217, 0.4);
+        }
+
+        /* 主内容区 */
+        .main-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* 卡片通用样式 */
+        .card {
+            background: rgba(20, 28, 40, 0.85);
+            border: 1px solid rgba(74, 144, 217, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+            backdrop-filter: blur(20px);
+            animation: fadeIn 0.5s ease-out;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .card:hover {
+            border-color: rgba(74, 144, 217, 0.6);
+            box-shadow: 0 8px 32px rgba(74, 144, 217, 0.15);
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-title {
+            font-size: 16px;
+            color: #778da9;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            background: #7eb8da;
+            border-radius: 2px;
+        }
+
+        /* 核心指标卡片 */
+        .metric-cards {
+            grid-column: span 4;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .metric-card {
+            text-align: center;
+            padding: 25px 15px;
+        }
+
+        .metric-value {
+            font-size: 56px;
+            font-weight: 700;
+            color: #7eb8da;
+            line-height: 1;
+            margin: 12px 0;
+            font-family: 'DIN Alternate', sans-serif;
+        }
+
+        .metric-value.positive {
+            color: #52c41a;
+        }
+
+        .metric-value.negative {
+            color: #ff6b6b;
+        }
+
+        .metric-unit {
+            font-size: 14px;
+            color: #778da9;
+        }
+
+        .metric-trend {
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .trend-up {
+            color: #52c41a;
+        }
+
+        .trend-down {
+            color: #ff6b6b;
+        }
+
+        /* 图表容器 */
+        .chart-container {
+            min-height: 300px;
+        }
+
+        /* 月度科室排名 - 左侧大卡 */
+        .monthly-dept-card {
+            grid-column: span 2;
+            grid-row: span 1;
+        }
+
+        /* 平台分布 - 右侧大卡 */
+        .platform-card {
+            grid-column: span 2;
+            grid-row: span 1;
+        }
+
+        /* 科室同比 */
+        .dept-yoy-card {
+            grid-column: span 2;
+        }
+
+        /* 当月明细 */
+        .detail-card {
+            grid-column: span 2;
+        }
+
+        /* 月度趋势 - 大卡片 */
+        .monthly-card {
+            grid-column: span 4;
+        }
+
+        /* 全年科室排名 - 底部 */
+        .yearly-dept-card {
+            grid-column: span 4;
+        }
+
+        .monthly-chart {
+            height: 200px;
+        }
+
+        /* 底部信息 */
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: #8a9cc2;
+            font-size: 12px;
+            border-top: 1px solid rgba(74, 144, 217, 0.2);
+        }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(20, 28, 40, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(74, 144, 217, 0.4);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #7eb8da;
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+        }
+
+        .loading::after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 3px solid #415a77;
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 响应式 */
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .metric-cards {
+                grid-column: span 2;
+            }
+            .monthly-card, .articles-card {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+            .metric-cards {
+                grid-column: span 1;
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .platform-card, .monthly-dept-card, .dept-yoy-card, .detail-card {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 标题区 -->
+    <header class="header">
+        <h1>✈️ 2026年地服部宣传数据可视化看板</h1>
+        <div class="header-right">
+            <div class="datetime" id="datetime"></div>
+        </div>
+    </header>
+
+    <!-- 控制栏 -->
+    <div class="controls">
+        <div class="control-group">
+            <span class="control-label">年份:</span>
+            <select id="yearSelect" onchange="updateDashboard()">
+                <option value="2026" selected>2026年</option>
+                <option value="2025">2025年</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <span class="control-label">月份:</span>
+            <select id="monthSelect" onchange="updateDashboard()">
+                <option value="1">1月</option>
+                <option value="2">2月</option>
+                <option value="3">3月</option>
+                <option value="4">4月</option>
+                <option value="5" selected>5月</option>
+                <option value="6">6月</option>
+                <option value="7">7月</option>
+                <option value="8">8月</option>
+                <option value="9">9月</option>
+                <option value="10">10月</option>
+                <option value="11">11月</option>
+                <option value="12">12月</option>
+            </select>
+        </div>
+        
+    </div>
+
+    <!-- 主内容区 -->
+    <main class="main-container">
+        <!-- 核心指标 -->
+        <div class="metric-cards">
+            <div class="card metric-card">
+                <div class="card-title">总稿件量</div>
+                <div class="metric-value" id="totalArticles">0</div>
+                <div class="metric-unit">篇</div>
+            </div>
+            <div class="card metric-card">
+                <div class="card-title">月均登稿</div>
+                <div class="metric-value" id="monthlyAvg">0</div>
+                <div class="metric-unit">篇/月</div>
+            </div>
+            <div class="card metric-card">
+                <div class="card-title">当月稿件</div>
+                <div class="metric-value" id="currentMonthArticles">0</div>
+                <div class="metric-unit">篇</div>
+            </div>
+            <div class="card metric-card">
+                <div class="card-title">同比增长</div>
+                <div class="metric-value" id="yearOverYear">0</div>
+                <div class="metric-unit">%</div>
+                <div class="metric-trend" id="trendText"></div>
+            </div>
+        </div>
+
+        <!-- 月度科室稿件排名 -->
+        <div class="card monthly-dept-card">
+            <div class="card-title">🏆 月度科室稿件排名</div>
+            <div class="chart-container" id="monthlyDeptChart"></div>
+        </div>
+
+        <!-- 平台分布 -->
+        <div class="card platform-card">
+            <div class="card-title">📊 平台分布</div>
+            <div class="chart-container" id="platformChart"></div>
+        </div>
+
+        <!-- 科室本月同比 -->
+        <div class="card dept-yoy-card">
+            <div class="card-title">📊 科室本月同比</div>
+            <div class="chart-container" id="deptYoyChart" style="height: 280px;"></div>
+        </div>
+
+        <!-- 当月详情 -->
+        <div class="card detail-card">
+            <div class="card-title">📋 当月平台明细</div>
+            <div class="chart-container" id="detailChart" style="height: 280px;"></div>
+        </div>
+
+        <!-- 月度趋势对比 -->
+        <div class="card monthly-card">
+            <div class="card-title">📈 月度趋势对比 (2025 vs 2026)</div>
+            <div class="monthly-chart" id="monthlyChart"></div>
+        </div>
+
+        <!-- 全年科室稿件排名 -->
+        <div class="card yearly-dept-card">
+            <div class="card-title">🏆 全年科室稿件排名</div>
+            <div class="chart-container" id="yearlyDeptChart" style="height: 220px;"></div>
+        </div>
+    </main>
+
+    <!-- 底部 -->
+    <footer class="footer">
+        南航上海分公司地服部 · 经营管理室 · 数据更新时间: <span id="updateTime"></span>
+    </footer>
+
+    <script>
+        // 全局数据
+        let dashboardData = {};
+        let currentYear = 2026;
+        currentMonth = 5;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDateTime();
+            loadDashboardData();
+            setInterval(updateDateTime, 1000);
+        });
+
+        // 更新时间显示
+        function updateDateTime() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                weekday: 'short'
+            });
+            const timeStr = now.toLocaleTimeString('zh-CN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('datetime').textContent = `${dateStr} ${timeStr}`;
+        }
+
+        // 加载数据
+        function loadDashboardData() {
+            dashboardData = {
+  "platform_distribution": {
+    "platforms": [
+      "内部媒体",
+      "行业媒体",
+      "主流媒体",
+      "公众号",
+      "视频号"
+    ],
+    "values": [
+      36,
+      4,
+      38,
+      16,
+      0
+    ],
+    "percentages": [
+      38.3,
+      4.3,
+      40.4,
+      17.0,
+      0.0
+    ]
+  },
+  "department_stats": {
+    "departments": [
+      "虹桥值机",
+      "虹桥高端",
+      "虹桥服务",
+      "浦东值机",
+      "浦东高端",
+      "浦东服务",
+      "客机",
+      "货机",
+      "勤务",
+      "运行管理室",
+      "经营管理室",
+      "安全管理室"
+    ],
+    "values": [
+      61,
+      50,
+      37,
+      53,
+      47,
+      39,
+      31,
+      13,
+      8,
+      18,
+      36,
+      3
+    ]
+  },
+  "monthly_data": {
+    "2025": {
+      "1月": {
+        "total": 7,
+        "departments": [
+          9,
+          10,
+          10,
+          11,
+          8,
+          6,
+          4,
+          3,
+          4,
+          4,
+          0
+        ]
+      },
+      "2月": {
+        "total": 3,
+        "departments": [
+          14,
+          3,
+          12,
+          18,
+          4,
+          4,
+          2,
+          1,
+          10,
+          2,
+          1
+        ]
+      },
+      "3月": {
+        "total": 2,
+        "departments": [
+          1,
+          9,
+          14,
+          12,
+          5,
+          4,
+          7,
+          3,
+          1,
+          3,
+          0
+        ]
+      },
+      "4月": {
+        "total": 5,
+        "departments": [
+          3,
+          3,
+          5,
+          9,
+          5,
+          6,
+          1,
+          2,
+          2,
+          5,
+          1
+        ]
+      },
+      "5月": {
+        "total": 9,
+        "departments": [
+          7,
+          5,
+          6,
+          7,
+          5,
+          5,
+          0,
+          3,
+          8,
+          5,
+          1
+        ]
+      },
+      "6月": {
+        "total": 4,
+        "departments": [
+          4,
+          6,
+          13,
+          12,
+          8,
+          3,
+          1,
+          0,
+          8,
+          9,
+          1
+        ]
+      },
+      "7月": {
+        "total": 3,
+        "departments": [
+          0,
+          4,
+          2,
+          3,
+          3,
+          1,
+          1,
+          1,
+          0,
+          4,
+          0
+        ]
+      },
+      "8月": {
+        "total": 45,
+        "departments": [
+          42,
+          45,
+          3,
+          3,
+          3,
+          44,
+          4,
+          4,
+          0,
+          46,
+          1
+        ]
+      },
+      "9月": {
+        "total": 9,
+        "departments": [
+          11,
+          8,
+          4,
+          4,
+          4,
+          2,
+          1,
+          1,
+          3,
+          12,
+          2
+        ]
+      },
+      "10月": {
+        "total": 11,
+        "departments": [
+          8,
+          2,
+          12,
+          9,
+          7,
+          3,
+          2,
+          2,
+          0,
+          3,
+          1
+        ]
+      },
+      "11月": {
+        "total": 15,
+        "departments": [
+          12,
+          3,
+          19,
+          17,
+          8,
+          1,
+          2,
+          0,
+          1,
+          2,
+          1
+        ]
+      },
+      "12月": {
+        "total": 5,
+        "departments": [
+          5,
+          0,
+          4,
+          5,
+          4,
+          6,
+          3,
+          3,
+          2,
+          11,
+          1
+        ]
+      }
+    },
+    "2026": {
+      "1月": {
+        "total": 7,
+        "departments": [
+          4,
+          3,
+          6,
+          1,
+          2,
+          8,
+          7,
+          2,
+          1,
+          0,
+          0
+        ]
+      },
+      "2月": {
+        "total": 22,
+        "departments": [
+          19,
+          13,
+          19,
+          17,
+          13,
+          12,
+          1,
+          1,
+          7,
+          14,
+          0
+        ]
+      },
+      "3月": {
+        "total": 15,
+        "departments": [
+          15,
+          8,
+          14,
+          14,
+          9,
+          5,
+          2,
+          1,
+          9,
+          8,
+          0
+        ]
+      },
+      "4月": {
+        "total": 13,
+        "departments": [
+          10,
+          10,
+          9,
+          11,
+          9,
+          3,
+          2,
+          3,
+          0,
+          8,
+          2
+        ]
+      },
+      "5月": {
+        "total": 4,
+        "departments": [
+          2,
+          3,
+          5,
+          4,
+          6,
+          3,
+          1,
+          1,
+          1,
+          6,
+          1
+        ]
+      },
+      "6月": {
+        "total": 0,
+        "departments": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "7月": {
+        "total": 0,
+        "departments": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "8月": {
+        "total": 0,
+        "departments": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "9月": {
+        "total": 0,
+        "departments": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "10月": {
+        "total": 0,
+        "departments": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "11月": {
+        "total": 0,
+        "departments": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "12月": {
+        "total": 0,
+        "departments": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  },
+  "year_over_year": {
+    "1月": {
+      "total": 0,
+      "departments": [
+        -5,
+        -7,
+        -4,
+        -10,
+        -6,
+        2,
+        3,
+        -1,
+        -3,
+        -4,
+        0
+      ]
+    },
+    "2月": {
+      "total": 19,
+      "departments": [
+        5,
+        10,
+        7,
+        -1,
+        9,
+        8,
+        -1,
+        0,
+        -3,
+        12,
+        -1
+      ]
+    },
+    "3月": {
+      "total": 13,
+      "departments": [
+        14,
+        -1,
+        0,
+        2,
+        4,
+        1,
+        -5,
+        -2,
+        8,
+        5,
+        0
+      ]
+    },
+    "4月": {
+      "total": 8,
+      "departments": [
+        7,
+        7,
+        4,
+        2,
+        4,
+        -3,
+        1,
+        1,
+        -2,
+        3,
+        1
+      ]
+    },
+    "5月": {
+      "total": -5,
+      "departments": [
+        -5,
+        -2,
+        -1,
+        -3,
+        1,
+        -2,
+        1,
+        -2,
+        -7,
+        1,
+        0
+      ]
+    },
+    "6月": {
+      "total": -4,
+      "departments": [
+        -4,
+        -6,
+        -13,
+        -12,
+        -8,
+        -3,
+        -1,
+        0,
+        -8,
+        -9,
+        -1
+      ]
+    },
+    "7月": {
+      "total": -3,
+      "departments": [
+        0,
+        -4,
+        -2,
+        -3,
+        -3,
+        -1,
+        -1,
+        -1,
+        0,
+        -4,
+        0
+      ]
+    },
+    "8月": {
+      "total": -45,
+      "departments": [
+        -42,
+        -45,
+        -3,
+        -3,
+        -3,
+        -44,
+        -4,
+        -4,
+        0,
+        -46,
+        -1
+      ]
+    },
+    "9月": {
+      "total": -9,
+      "departments": [
+        -11,
+        -8,
+        -4,
+        -4,
+        -4,
+        -2,
+        -1,
+        -1,
+        -3,
+        -12,
+        -2
+      ]
+    },
+    "10月": {
+      "total": -11,
+      "departments": [
+        -8,
+        -2,
+        -12,
+        -9,
+        -7,
+        -3,
+        -2,
+        -2,
+        0,
+        -3,
+        -1
+      ]
+    },
+    "11月": {
+      "total": -15,
+      "departments": [
+        -12,
+        -3,
+        -19,
+        -17,
+        -8,
+        -1,
+        -2,
+        0,
+        -1,
+        -2,
+        -1
+      ]
+    },
+    "12月": {
+      "total": -5,
+      "departments": [
+        -5,
+        0,
+        -4,
+        -5,
+        -4,
+        -6,
+        -3,
+        -3,
+        -2,
+        -11,
+        -1
+      ]
+    }
+  },
+  "quarter_yoy": {
+    "一季度": {
+      "2025": 76,
+      "2026": 44,
+      "yoy": 32
+    },
+    "二季度": {
+      "2025": 18,
+      "2026": 17,
+      "yoy": -1
+    },
+    "三季度": {
+      "2025": 57,
+      "2026": 0,
+      "yoy": -57
+    },
+    "四季度": {
+      "2025": 31,
+      "2026": 0,
+      "yoy": -31
+    }
+  },
+  "summary": {
+    "total_articles": 94,
+    "monthly_avg": 7.83,
+    "current_month_articles": 11,
+    "current_year": 2026,
+    "current_month": 5
+  },
+  "current_month_platform": {
+    "主流媒体": 3,
+    "行业媒体": 0,
+    "南航报": 0,
+    "南航视窗": 4,
+    "沪上木棉": 2,
+    "视频号": 0
+  },
+  "department_yoy": {
+    "1月": {
+      "地服部": 0,
+      "虹桥值机室": -5,
+      "虹桥高端服务室": -7,
+      "虹桥服务室": -4,
+      "浦东值机室": -10,
+      "浦东高端服务室": -6,
+      "浦东服务室": 2,
+      "客机保障室": 3,
+      "货机保障室": -1,
+      "勤务保障室": -3,
+      "运行管理室": -4,
+      "经营管理室": 0,
+      "安全管理室": 0
+    },
+    "2月": {
+      "地服部": 19,
+      "虹桥值机室": 5,
+      "虹桥高端服务室": 10,
+      "虹桥服务室": 7,
+      "浦东值机室": -1,
+      "浦东高端服务室": 9,
+      "浦东服务室": 8,
+      "客机保障室": -1,
+      "货机保障室": 0,
+      "勤务保障室": -3,
+      "运行管理室": 12,
+      "经营管理室": -1,
+      "安全管理室": 0
+    },
+    "3月": {
+      "地服部": 13,
+      "虹桥值机室": 14,
+      "虹桥高端服务室": -1,
+      "虹桥服务室": 0,
+      "浦东值机室": 2,
+      "浦东高端服务室": 4,
+      "浦东服务室": 1,
+      "客机保障室": -5,
+      "货机保障室": -2,
+      "勤务保障室": 8,
+      "运行管理室": 5,
+      "经营管理室": 0,
+      "安全管理室": 0
+    },
+    "4月": {
+      "地服部": 8,
+      "虹桥值机室": 7,
+      "虹桥高端服务室": 7,
+      "虹桥服务室": 4,
+      "浦东值机室": 2,
+      "浦东高端服务室": 4,
+      "浦东服务室": -3,
+      "客机保障室": 1,
+      "货机保障室": 1,
+      "勤务保障室": -2,
+      "运行管理室": 3,
+      "经营管理室": 1,
+      "安全管理室": 0
+    },
+    "5月": {
+      "地服部": -5,
+      "虹桥值机室": -5,
+      "虹桥高端服务室": -2,
+      "虹桥服务室": -1,
+      "浦东值机室": -3,
+      "浦东高端服务室": 1,
+      "浦东服务室": -2,
+      "客机保障室": 1,
+      "货机保障室": -2,
+      "勤务保障室": -7,
+      "运行管理室": 1,
+      "经营管理室": 0,
+      "安全管理室": 0
+    },
+    "6月": {
+      "地服部": -4,
+      "虹桥值机室": -4,
+      "虹桥高端服务室": -6,
+      "虹桥服务室": -13,
+      "浦东值机室": -12,
+      "浦东高端服务室": -8,
+      "浦东服务室": -3,
+      "客机保障室": -1,
+      "货机保障室": 0,
+      "勤务保障室": -8,
+      "运行管理室": -9,
+      "经营管理室": -1,
+      "安全管理室": 0
+    },
+    "7月": {
+      "地服部": -3,
+      "虹桥值机室": 0,
+      "虹桥高端服务室": -4,
+      "虹桥服务室": -2,
+      "浦东值机室": -3,
+      "浦东高端服务室": -3,
+      "浦东服务室": -1,
+      "客机保障室": -1,
+      "货机保障室": -1,
+      "勤务保障室": 0,
+      "运行管理室": -4,
+      "经营管理室": 0,
+      "安全管理室": 0
+    },
+    "8月": {
+      "地服部": -45,
+      "虹桥值机室": -42,
+      "虹桥高端服务室": -45,
+      "虹桥服务室": -3,
+      "浦东值机室": -3,
+      "浦东高端服务室": -3,
+      "浦东服务室": -44,
+      "客机保障室": -4,
+      "货机保障室": -4,
+      "勤务保障室": 0,
+      "运行管理室": -46,
+      "经营管理室": -1,
+      "安全管理室": 0
+    },
+    "9月": {
+      "地服部": -9,
+      "虹桥值机室": -11,
+      "虹桥高端服务室": -8,
+      "虹桥服务室": -4,
+      "浦东值机室": -4,
+      "浦东高端服务室": -4,
+      "浦东服务室": -2,
+      "客机保障室": -1,
+      "货机保障室": -1,
+      "勤务保障室": -3,
+      "运行管理室": -12,
+      "经营管理室": -2,
+      "安全管理室": 0
+    },
+    "10月": {
+      "地服部": -11,
+      "虹桥值机室": -8,
+      "虹桥高端服务室": -2,
+      "虹桥服务室": -12,
+      "浦东值机室": -9,
+      "浦东高端服务室": -7,
+      "浦东服务室": -3,
+      "客机保障室": -2,
+      "货机保障室": -2,
+      "勤务保障室": 0,
+      "运行管理室": -3,
+      "经营管理室": -1,
+      "安全管理室": 0
+    },
+    "11月": {
+      "地服部": -15,
+      "虹桥值机室": -12,
+      "虹桥高端服务室": -3,
+      "虹桥服务室": -19,
+      "浦东值机室": -17,
+      "浦东高端服务室": -8,
+      "浦东服务室": -1,
+      "客机保障室": -2,
+      "货机保障室": 0,
+      "勤务保障室": -1,
+      "运行管理室": -2,
+      "经营管理室": -1,
+      "安全管理室": 0
+    },
+    "12月": {
+      "地服部": -5,
+      "虹桥值机室": -5,
+      "虹桥高端服务室": 0,
+      "虹桥服务室": -4,
+      "浦东值机室": -5,
+      "浦东高端服务室": -4,
+      "浦东服务室": -6,
+      "客机保障室": -3,
+      "货机保障室": -3,
+      "勤务保障室": -2,
+      "运行管理室": -11,
+      "经营管理室": -1,
+      "安全管理室": 0
+    }
+  },
+  "quarter_dept_yoy": {
+    "一季度": {
+      "虹桥值机": 32,
+      "虹桥高端": 14,
+      "虹桥服务": 2,
+      "浦东值机": 3,
+      "浦东高端": -9,
+      "浦东服务": 7,
+      "客机": 11,
+      "货机": -3,
+      "勤务": -3,
+      "运行管理室": 2,
+      "经营管理室": 13,
+      "安全管理室": -1
+    },
+    "二季度": {
+      "虹桥值机": -1,
+      "虹桥高端": -2,
+      "虹桥服务": -1,
+      "浦东值机": -10,
+      "浦东高端": -13,
+      "浦东服务": -3,
+      "客机": -8,
+      "货机": 1,
+      "勤务": -1,
+      "运行管理室": -17,
+      "经营管理室": -5,
+      "安全管理室": 0
+    }
+  }
+};
+            initCharts();
+            updateMetrics();
+            updateUpdateTime();
+        }
+
+        // 初始化图表
+        function initCharts() {
+            initPlatformChart();
+            initMonthlyDeptChart();
+            initYearlyDeptChart();
+            initMonthlyChart();
+            initDeptYoyChart();
+            initDetailChart();
+        }
+
+        // 平台分布饼图
+        function initPlatformChart() {
+            const chart = echarts.init(document.getElementById('platformChart'));
+            const option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}: {c}篇 ({d}%)',
+                    backgroundColor: '#1e293b',
+                    borderColor: '#475569',
+                    borderWidth: 2,
+                    textStyle: { color: '#f1f5f9', fontSize: 14 }
+                },
+                series: [{
+                    type: 'pie',
+                    radius: ['35%', '65%'],
+                    center: ['50%', '50%'],
+                    avoidLabelOverlap: true,
+                    itemStyle: {
+                        borderRadius: 10,
+                        borderColor: 'rgba(20, 28, 40, 0.8)',
+                        borderWidth: 3
+                    },
+                    label: {
+                        show: true,
+                        formatter: '{b}\n{c}篇 ({d}%)',
+                        color: '#e2e8f0',
+                        fontSize: 13,
+                        lineHeight: 20
+                    },
+                    emphasis: {
+                        label: { show: true, fontSize: 15, fontWeight: 'bold' },
+                        itemStyle: {
+                            shadowBlur: 30,
+                            shadowColor: 'rgba(126, 184, 218, 0.4)'
+                        }
+                    },
+                    data: dashboardData.platform_distribution.platforms.map((name, i) => ({
+                        value: dashboardData.platform_distribution.values[i],
+                        name: name,
+                        itemStyle: {
+                            color: ['#7eb8da', '#4a90d9', '#22c55e', '#faad14', '#8c8c8c'][i]
+                        }
+                    })),
+                    animationType: 'scale',
+                    animationEasing: 'elasticOut',
+                    animationDuration: 1200
+                }]
+            };
+            chart.setOption(option);
+            window.addEventListener('resize', () => chart.resize());
+        }
+
+        // 月度科室稿件排名（当月各科室排名）
+        function initMonthlyDeptChart() {
+            const chart = echarts.init(document.getElementById('monthlyDeptChart'));
+            const year = document.getElementById('yearSelect').value;
+            const currentMonthName = document.getElementById('monthSelect').value + '月';
+            const deptNames = dashboardData.department_stats.departments;
+            const monthlyDepts = dashboardData.monthly_data[year]?.[currentMonthName]?.departments || [];
+
+            const sortedData = deptNames.map((name, i) => ({ name, value: monthlyDepts[i] || 0 }))
+                .filter(d => d.name !== '地服部')
+                .sort((a, b) => b.value - a.value);
+
+            // 获取同比数据
+            const prevYear = parseInt(year) - 1;
+            const prevMonthDepts = dashboardData.monthly_data[prevYear]?.[currentMonthName]?.departments || [];
+            const prevMap = deptNames.reduce((acc, name, i) => { acc[name] = prevMonthDepts[i] || 0; return acc; }, {});
+
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' },
+                    backgroundColor: '#1e293b',
+                    borderColor: '#475569',
+                    borderWidth: 2,
+                    textStyle: { color: '#f1f5f9', fontSize: 14 },
+                    formatter: params => {
+                        const p = params[0];
+                        const prev = prevMap[p.name] || 0;
+                        const diff = p.value - prev;
+                        const diffColor = diff >= 0 ? '#22c55e' : '#ef4444';
+                        const diffText = diff >= 0 ? `+${diff}` : `${diff}`;
+                        return `<b>${p.name}</b><br/>当月: <b>${p.value}</b>篇<br/>去年同月: ${prev}篇<br/><span style="color:${diffColor}">同比: ${diffText}</span>`;
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '10%',
+                    bottom: '3%',
+                    top: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value',
+                    axisLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.3)' } },
+                    axisLabel: { color: '#8a9cc2' },
+                    splitLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.15)', type: 'dashed' } }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: sortedData.map(d => d.name),
+                    axisLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.3)' } },
+                    axisLabel: { color: '#c8d4e8', fontSize: 12 },
+                    inverse: true
+                },
+                series: [{
+                    type: 'bar',
+                    data: sortedData.map((d, i) => {
+                        const prev = prevMap[d.name] || 0;
+                        const diff = d.value - prev;
+                        const barColor = i < 3 ? '#4a90d9' : '#7eb8da';
+                        return {
+                            value: d.value,
+                            itemStyle: {
+                                color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                                    { offset: 0, color: 'rgba(74, 144, 217, 0.2)' },
+                                    { offset: 1, color: barColor }
+                                ]),
+                                borderRadius: [0, 6, 6, 0]
+                            }
+                        };
+                    }),
+                    barWidth: '55%',
+                    animationDuration: 1000,
+                    animationEasing: 'cubicOut',
+                    label: {
+                        show: true,
+                        position: 'right',
+                        formatter: '{c}篇',
+                        color: '#e2e8f0',
+                        fontSize: 14,
+                        fontWeight: '600'
+                    }
+                }]
+            };
+            chart.setOption(option);
+            window.addEventListener('resize', () => chart.resize());
+        }
+
+        // 全年科室稿件排名
+        function initYearlyDeptChart() {
+            const chart = echarts.init(document.getElementById('yearlyDeptChart'));
+            const sortedData = dashboardData.department_stats.departments
+                .map((name, i) => ({ name, value: dashboardData.department_stats.values[i] }))
+                .filter(d => d.name !== '地服部')
+                .sort((a, b) => b.value - a.value);
+
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' },
+                    backgroundColor: '#1e293b',
+                    borderColor: '#475569',
+                    borderWidth: 2,
+                    textStyle: { color: '#f1f5f9', fontSize: 14 },
+                    formatter: params => {
+                        const p = params[0];
+                        return `<b>${p.name}</b><br/>全年累计: <b>${p.value}</b>篇`;
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '8%',
+                    bottom: '5%',
+                    top: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: sortedData.map(d => d.name),
+                    axisLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.3)' } },
+                    axisLabel: { color: '#8a9cc2', fontSize: 12, rotate: 0 }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.3)' } },
+                    axisLabel: { color: '#8a9cc2' },
+                    splitLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.15)', type: 'dashed' } }
+                },
+                series: [{
+                    type: 'bar',
+                    data: sortedData.map((d, i) => ({
+                        value: d.value,
+                        itemStyle: {
+                            color: i < 3 ? '#4a90d9' : 'rgba(126, 184, 218, 0.6)',
+                            borderRadius: [6, 6, 0, 0]
+                        }
+                    })),
+                    barWidth: '45%',
+                    animationDuration: 1000,
+                    label: {
+                        show: true,
+                        position: 'top',
+                        formatter: '{c}篇',
+                        color: '#e2e8f0',
+                        fontSize: 13,
+                        fontWeight: '600'
+                    }
+                }]
+            };
+            chart.setOption(option);
+            window.addEventListener('resize', () => chart.resize());
+        }
+
+        // 月度趋势折线图
+        function initMonthlyChart() {
+            const chart = echarts.init(document.getElementById('monthlyChart'));
+            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+            const data2025 = months.map(m => dashboardData.monthly_data['2025'][m].total);
+            const data2026 = months.map(m => dashboardData.monthly_data['2026'][m].total);
+
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(20, 28, 40, 0.95)',
+                    borderColor: '#7eb8da',
+                    borderWidth: 1,
+                    textStyle: { color: '#c8d4e8' }
+                },
+                legend: {
+                    data: ['2025年', '2026年'],
+                    textStyle: { color: '#8a9cc2' },
+                    top: 0
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '10%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: months,
+                    axisLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.3)' } },
+                    axisLabel: { color: '#8a9cc2' }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.3)' } },
+                    axisLabel: { color: '#8a9cc2' },
+                    splitLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.2)', type: 'dashed' } }
+                },
+                series: [
+                    {
+                        name: '2025年',
+                        type: 'line',
+                        data: data2025,
+                        smooth: true,
+                        lineStyle: { color: '#8a9cc2', width: 2, type: 'dashed' },
+                        itemStyle: { color: '#8a9cc2' },
+                        symbol: 'circle',
+                        symbolSize: 6,
+                        animationDuration: 1500
+                    },
+                    {
+                        name: '2026年',
+                        type: 'line',
+                        data: data2026,
+                        smooth: true,
+                        lineStyle: { color: '#4a90d9', width: 3 },
+                        itemStyle: { color: '#4a90d9' },
+                        symbol: 'circle',
+                        symbolSize: 8,
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(74, 144, 217, 0.25)' },
+                                { offset: 1, color: 'rgba(74, 144, 217, 0.02)' }
+                            ])
+                        },
+                        animationDuration: 1500
+                    }
+                ]
+            };
+            chart.setOption(option);
+            window.addEventListener('resize', () => chart.resize());
+        }
+
+        // 科室本月同比图表（显示数量）
+        function initDeptYoyChart() {
+            const chart = echarts.init(document.getElementById('deptYoyChart')); 
+            const currentMonthName = document.getElementById('monthSelect').value + '月';
+            const year = document.getElementById('yearSelect').value;
+            const prevYear = parseInt(year) - 1;
+
+            // 获取今年和去年当月各科室稿件数
+            const currentMonthDeptData = dashboardData.monthly_data[year]?.[currentMonthName]?.departments || [];
+            const prevMonthDeptData = dashboardData.monthly_data[prevYear]?.[currentMonthName]?.departments || [];
+
+            // 科室名称列表
+            const deptNames = dashboardData.department_stats.departments;
+
+            // 计算各科室同比数量差异
+            const deptDiff = deptNames.map((name, i) => {
+                const current = currentMonthDeptData[i] || 0;
+                const prev = prevMonthDeptData[i] || 0;
+                return { name, diff: current - prev, current, prev }; 
+            }).filter(d => d.name !== '地服部').sort((a, b) => b.diff - a.diff);
+
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' },
+                    backgroundColor: '#1e293b',
+                    borderColor: '#475569',
+                    borderWidth: 2,
+                    textStyle: { color: '#f1f5f9', fontSize: 15 },
+                    padding: [12, 16],
+                    formatter: params => {
+                        const p = params[0];
+                        const diff = p.value;
+                        const dept = deptDiff.find(d => d.name === p.name);
+                        const bgColor = diff >= 0 ? '#22c55e' : '#ef4444';
+                        const trendText = diff >= 0 ? '增加' : '减少';
+                        return `<div style="font-weight:700;font-size:16px;margin-bottom:10px;color:#f8fafc">${p.name}</div>` +
+                               `<div style="background:${bgColor};color:#fff;padding:4px 10px;border-radius:4px;font-weight:600;display:inline-block">${trendText}: ${Math.abs(diff)}篇</div>` +
+                               `<div style="margin-top:8px;color:#cbd5e1">今年: <b style="color:#f8fafc">${dept?.current || 0}</b> 篇</div>` +
+                               `<div style="color:#cbd5e1">去年: <b style="color:#f8fafc">${dept?.prev || 0}</b> 篇</div>`;
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '15%',
+                    top: '8%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: deptDiff.map(d => d.name),
+                    axisLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.3)' } },
+                    axisLabel: { color: '#c8d4e8', fontSize: 12, rotate: 25 }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.3)' } },
+                    axisLabel: { color: '#8a9cc2' },
+                    splitLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.2)', type: 'dashed' } }
+                },
+                series: [{
+                    type: 'bar',
+                    data: deptDiff.map(d => ({
+                        value: d.diff,
+                        itemStyle: {
+                            color: d.diff >= 0 ? '#22c55e' : '#ef4444',
+                            borderRadius: d.diff >= 0 ? [4, 4, 0, 0] : [0, 0, 4, 4]
+                        }
+                    })),
+                    barWidth: '50%',
+                    animationDuration: 800,
+                    label: {
+                        show: true,
+                        position: d => d.value >= 0 ? 'top' : 'bottom',
+                        formatter: p => p.value >= 0 ? `+${p.value}` : `${p.value}`,
+                        color: '#ffffff',
+                        fontSize: 15,
+                        fontWeight: 'bold',
+                        distance: 8,
+                        textBorderColor: p => p.value >= 0 ? '#22c55e' : '#ef4444',
+                        textBorderWidth: 2
+                    },
+                    markLine: {
+                        silent: true,
+                        data: [{ yAxis: 0 }],
+                        lineStyle: { color: '#64748b', width: 2, type: 'dashed' },
+                        label: { show: false }
+                    }
+                }]
+            };
+            chart.setOption(option);
+            window.addEventListener('resize', () => chart.resize());
+        }
+
+        // 当月平台明细
+        function initDetailChart() {
+            const chart = echarts.init(document.getElementById('detailChart'));
+            const platforms = Object.keys(dashboardData.current_month_platform);
+            const values = Object.values(dashboardData.current_month_platform);
+
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' },
+                    backgroundColor: 'rgba(20, 28, 40, 0.95)',
+                    borderColor: '#7eb8da',
+                    borderWidth: 1,
+                    textStyle: { color: '#c8d4e8' }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '15%',
+                    top: '5%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: platforms,
+                    axisLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.3)' } },
+                    axisLabel: { color: '#c8d4e8', fontSize: 10, rotate: 20 }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.3)' } },
+                    axisLabel: { color: '#8a9cc2' },
+                    splitLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.2)', type: 'dashed' } }
+                },
+                series: [{
+                    type: 'bar',
+                    data: values.map(v => ({
+                        value: v,
+                        itemStyle: {
+                            color: v > 0
+                                ? new echarts.graphic.LinearGradient(0, 1, 0, 0, [
+                                    { offset: 0, color: 'rgba(74, 144, 217, 0.3)' },
+                                    { offset: 1, color: '#4a90d9' }
+                                ])
+                                : 'rgba(74, 144, 217, 0.15)',
+                            borderRadius: [6, 6, 0, 0]
+                        }
+                    })),
+                    barWidth: '45%',
+                    animationDuration: 800
+                }]
+            };
+            chart.setOption(option);
+            window.addEventListener('resize', () => chart.resize());
+        }
+
+        // 更新核心指标
+        function updateMetrics() {
+            animateNumber('totalArticles', dashboardData.summary.total_articles);
+            animateNumber('monthlyAvg', dashboardData.summary.monthly_avg, 2);
+            animateNumber('currentMonthArticles', dashboardData.summary.current_month_articles);
+
+            const monthName = document.getElementById('monthSelect').value + '月';
+            const year = document.getElementById('yearSelect').value;
+            const yoyValue = dashboardData.year_over_year[monthName]?.total || 0;
+
+            const yoyElement = document.getElementById('yearOverYear');
+            yoyElement.textContent = yoyValue;
+            yoyElement.className = 'metric-value ' + (yoyValue >= 0 ? 'positive' : 'negative');
+
+            const trendElement = document.getElementById('trendText');
+            trendElement.innerHTML = yoyValue >= 0
+                ? '<span class="trend-up">↑ 同比上升</span>'
+                : '<span class="trend-down">↓ 同比下降</span>';
+        }
+
+        // 数字动画
+        function animateNumber(elementId, targetValue, decimals = 0) {
+            const element = document.getElementById(elementId);
+            const startValue = parseFloat(element.textContent) || 0;
+            const duration = 1000;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeProgress = 1 - Math.pow(1 - progress, 3);
+                const currentValue = startValue + (targetValue - startValue) * easeProgress;
+
+                element.textContent = decimals > 0
+                    ? currentValue.toFixed(decimals)
+                    : Math.round(currentValue);
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        // 更新看板
+        function updateDashboard() {
+            currentYear = parseInt(document.getElementById('yearSelect').value);
+            currentMonth = parseInt(document.getElementById('monthSelect').value);
+            updateMetrics();
+
+            // 重新初始化科室同比图表
+            initDeptYoyChart();
+
+            // 更新月度图表高亮当前月份
+            const monthlyChart = echarts.getInstanceByDom(document.getElementById('monthlyChart'));
+            if (monthlyChart) {
+                monthlyChart.dispatchAction({
+                    type: 'showTip',
+                    seriesIndex: 1,
+                    dataIndex: currentMonth - 1
+                });
+            }
+        }
+
+
+        // 更新数据时间
+        function updateUpdateTime() {
+            document.getElementById('updateTime').textContent = new Date().toLocaleString('zh-CN');
+        }
+    </script>
+</body>
+</html>
