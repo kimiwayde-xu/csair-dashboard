@@ -960,7 +960,7 @@
             const monthData = dashboardData.monthly_data[currentYear]?.[monthName];
             if (!monthData) return;
             
-            const depts = Object.keys(monthData.departments || {});
+            const depts = monthData.departments;
             const values = depts.map(d => monthData.departments[d]);
             
             const option = {
