@@ -1063,11 +1063,14 @@
         function initDeptYoyChart() {
             const chart = echarts.init(document.getElementById('deptYoyChart'));
             const monthName = currentMonth + '月';
-            const yoyData = dashboardData.department_yoy?.[monthName] || {};
             
-            // department_yoy 是对象 {科室名: 同比数值}
-            const depts = Object.keys(yoyData);
-            const values = Object.values(yoyData);
+            // 从 year_over_year 获取科室同比数据（数组）
+            // 注意：year_over_year[monthName].departments 是数组（11个值）
+            // 科室名称列表需要从 department_stats 截取对应长度
+            const yoyDepts = dashboardData.year_over_year?.[monthName]?.departments || [];
+            const allDepts = dashboardData.department_stats.departments;
+            const depts = allDepts.slice(0, yoyDepts.length);  // 只取数据对应的科室
+            const values = yoyDepts;
             
             const option = {
                 tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
