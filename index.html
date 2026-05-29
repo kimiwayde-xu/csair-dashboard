@@ -961,7 +961,7 @@
             if (!monthData) return;
             
             const depts = monthData.departments;
-            const values = depts.map(d => monthData.departments[d]);
+            const values = monthData.values;
             
             const option = {
                 tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
