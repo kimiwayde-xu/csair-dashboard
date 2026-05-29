@@ -16,34 +16,38 @@
         }
         .header {
             background: linear-gradient(90deg, #1a2d4a 0%, #3d6b99 50%, #1a2d4a 100%);
-            padding: 20px 40px;
+            padding: 25px 40px;
             border-radius: 12px;
             margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 4px 20px rgba(74, 144, 217, 0.2);
         }
-        .header h1 { color: #fff; font-size: 32px; letter-spacing: 4px; }
+        .header h1 { color: #fff; font-size: 36px; letter-spacing: 4px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        #datetime { color: #7eb8da; font-size: 18px; }
         .controls {
             background: rgba(26, 45, 74, 0.6);
-            padding: 15px 30px;
+            padding: 18px 30px;
             border-radius: 12px;
             margin-bottom: 20px;
             display: flex;
             gap: 30px;
             align-items: center;
         }
-        .control-group { display: flex; align-items: center; gap: 10px; }
-        .control-label { color: #8a9cc2; font-size: 14px; }
+        .control-group { display: flex; align-items: center; gap: 12px; }
+        .control-label { color: #8a9cc2; font-size: 16px; }
         select {
             background: rgba(20, 28, 40, 0.8);
             color: #c8d4e8;
             border: 1px solid rgba(74, 144, 217, 0.3);
-            padding: 8px 15px;
+            padding: 10px 18px;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 16px;
             cursor: pointer;
+            transition: all 0.3s;
         }
+        select:hover { border-color: #4a90d9; }
         .metric-cards {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -54,11 +58,13 @@
             background: rgba(26, 45, 74, 0.6);
             border: 1px solid rgba(74, 144, 217, 0.2);
             border-radius: 12px;
-            padding: 20px;
+            padding: 25px;
             text-align: center;
+            transition: all 0.3s;
         }
-        .metric-label { color: #8a9cc2; font-size: 14px; margin-bottom: 10px; }
-        .metric-value { color: #fff; font-size: 36px; font-weight: bold; }
+        .metric-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(74, 144, 217, 0.15); }
+        .metric-label { color: #8a9cc2; font-size: 16px; margin-bottom: 12px; }
+        .metric-value { color: #fff; font-size: 42px; font-weight: bold; }
         .dashboard {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -68,16 +74,29 @@
             background: rgba(26, 45, 74, 0.6);
             border: 1px solid rgba(74, 144, 217, 0.2);
             border-radius: 12px;
-            padding: 20px;
+            padding: 25px;
             backdrop-filter: blur(10px);
+            transition: all 0.3s;
         }
+        .card:hover { box-shadow: 0 4px 20px rgba(74, 144, 217, 0.15); }
         .card-title {
-            font-size: 16px;
+            font-size: 20px;
             color: #7eb8da;
-            margin-bottom: 15px;
+            margin-bottom: 18px;
             font-weight: 600;
         }
-        .chart-container { height: 280px; }
+        .chart-container { height: 300px; }
+        .yearly-chart { height: 240px; }
+        
+        /* 前三名高亮动画 */
+        @keyframes glow {
+            0%, 100% { filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8)); }
+            50% { filter: drop-shadow(0 0 15px rgba(255, 215, 0, 1)); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
     </style>
 </head>
 <body>
@@ -148,7 +167,7 @@
 
         <div class="card" style="grid-column: span 4;">
             <div class="card-title">🏆 全年科室稿件排名</div>
-            <div class="chart-container" id="yearlyDeptChart" style="height: 220px;"></div>
+            <div class="chart-container yearly-chart" id="yearlyDeptChart"></div>
         </div>
     </div>
 
@@ -175,14 +194,14 @@
             const d = dashboardData.platform_distribution;
             const option = {
                 tooltip: { trigger: 'item', formatter: '{b}: {c}篇 ({d}%)' },
-                legend: { bottom: 0, textStyle: { color: '#8a9cc2', fontSize: 12 } },
+                legend: { bottom: 0, textStyle: { color: '#8a9cc2', fontSize: 14 } },
                 series: [{
                     type: 'pie',
                     radius: ['40%', '65%'],
                     center: ['50%', '45%'],
                     data: d.platforms.map((p, i) => ({ value: d.values[i], name: p })),
                     emphasis: { itemStyle: { shadowBlur: 20, shadowColor: 'rgba(74,144,217,0.5)' } },
-                    label: { color: '#c8d4e8', fontSize: 12, formatter: '{b}\n{c}篇 ({d}%)' },
+                    label: { color: '#c8d4e8', fontSize: 14, formatter: '{b}\n{c}篇 ({d}%)' },
                     itemStyle: { borderRadius: 6, borderColor: '#0a0e17', borderWidth: 2 }
                 }]
             };
@@ -190,68 +209,159 @@
             window.addEventListener('resize', () => chart.resize());
         }
 
-        // ========== 2. 月度科室排名 ==========
+        // ========== 2. 月度科室排名（前三名高亮）==========
         function initMonthlyDeptChart() {
             const chart = echarts.init(document.getElementById('monthlyDeptChart'));
             const monthName = currentMonth + '月';
             const monthData = dashboardData.monthly_data[currentYear]?.[monthName];
             if (!monthData) return;
             
-            // 注意：monthData.departments 是数组（已经是值），不是对象
-            const depts = dashboardData.department_stats.departments; // 科室名称
-            const values = monthData.departments; // 当月各科室稿件数（数组）
+            const depts = dashboardData.department_stats.departments;
+            const values = monthData.departments;
+            
+            // 找出前三名的索引
+            const sorted = values.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v);
+            const top3 = new Set(sorted.slice(0, 3).map(x => x.i));
+            
+            // 前三名颜色：金、银、铜
+            const topColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
             
             const option = {
                 tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
                 grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: 10, rotate: 20 } },
-                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2' } },
+                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: 12, rotate: 20 } },
+                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: 12 } },
                 series: [{
                     type: 'bar',
-                    data: values,
-                    itemStyle: { 
-                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                            { offset: 0, color: '#4a90d9' }, 
-                            { offset: 1, color: '#1a2d4a' }
-                        ]), 
-                        borderRadius: [6, 6, 0, 0] 
-                    },
-                    barWidth: '45%',
-                    label: { show: true, position: 'top', color: '#fff', fontSize: 12 }
-                }]
+                    data: values.map((v, i) => {
+                        let color, borderRadius;
+                        if (top3.has(i)) {
+                            const rank = sorted.findIndex(x => x.i === i);
+                            color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: topColors[rank] },
+                                { offset: 1, color: '#1a2d4a' }
+                            ]);
+                            borderRadius = [8, 8, 0, 0];
+                        } else {
+                            color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: '#4a90d9' },
+                                { offset: 1, color: '#1a2d4a' }
+                            ]);
+                            borderRadius = [6, 6, 0, 0];
+                        }
+                        return {
+                            value: v,
+                            itemStyle: { color, borderRadius, shadowBlur: top3.has(i) ? 15 : 0, shadowColor: top3.has(i) ? topColors[sorted.findIndex(x => x.i === i)] : 'transparent' }
+                        };
+                    }),
+                    barWidth: '50%',
+                    label: { show: true, position: 'top', color: '#fff', fontSize: 14, fontWeight: 'bold' },
+                    animationDelay: (idx) => idx * 50,
+                    animationEasing: 'elasticOut'
+                }],
+                animationDuration: 1500
             };
             chart.setOption(option);
             window.addEventListener('resize', () => chart.resize());
         }
 
-        // ========== 3. 全年科室排名 ==========
+        // ========== 3. 全年科室排名（动画+前三高亮）==========
         function initYearlyDeptChart() {
             const chart = echarts.init(document.getElementById('yearlyDeptChart'));
             const deptData = dashboardData.department_stats;
             const depts = deptData.departments;
             const values = deptData.values;
             
+            // 找出前三名
+            const sorted = values.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v);
+            const top3 = new Set(sorted.slice(0, 3).map(x => x.i));
+            const topColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
+            
             const option = {
                 tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-                grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: 10, rotate: 20 } },
-                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2' } },
+                grid: { left: '3%', right: '4%', bottom: '12%', top: '8%', containLabel: true },
+                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: 12, rotate: 20 } },
+                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: 12 } },
                 series: [{
                     type: 'bar',
-                    data: values,
-                    itemStyle: { 
-                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                            { offset: 0, color: '#7eb8da' }, 
-                            { offset: 1, color: '#1a2d4a' }
-                        ]), 
-                        borderRadius: [6, 6, 0, 0] 
+                    data: values.map((v, i) => {
+                        let color, shadowBlur, shadowColor;
+                        if (top3.has(i)) {
+                            const rank = sorted.findIndex(x => x.i === i);
+                            color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: topColors[rank] },
+                                { offset: 1, color: '#1a2d4a' }
+                            ]);
+                            shadowBlur = 20;
+                            shadowColor = topColors[rank];
+                        } else {
+                            color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: '#7eb8da' },
+                                { offset: 1, color: '#1a2d4a' }
+                            ]);
+                            shadowBlur = 0;
+                            shadowColor = 'transparent';
+                        }
+                        return {
+                            value: v,
+                            itemStyle: { color, borderRadius: [8, 8, 0, 0], shadowBlur, shadowColor }
+                        };
+                    }),
+                    barWidth: '50%',
+                    label: { 
+                        show: true, 
+                        position: 'top', 
+                        color: '#fff', 
+                        fontSize: 14, 
+                        fontWeight: 'bold',
+                        formatter: function(params) {
+                            const rank = sorted.findIndex(x => x.i === params.dataIndex);
+                            if (rank < 3) {
+                                return ['🥇', '🥈', '🥉'][rank] + ' ' + params.value;
+                            }
+                            return params.value;
+                        }
                     },
-                    barWidth: '45%',
-                    label: { show: true, position: 'top', color: '#fff', fontSize: 12 }
+                    animationDuration: 2000,
+                    animationDelay: (idx) => idx * 100,
+                    animationEasing: 'elasticOut'
                 }]
             };
             chart.setOption(option);
             window.addEventListener('resize', () => chart.resize());
+            
+            // 动态闪烁效果
+            let highlight = true;
+            setInterval(() => {
+                chart.setOption({
+                    series: [{
+                        data: values.map((v, i) => {
+                            let color, shadowBlur, shadowColor;
+                            if (top3.has(i)) {
+                                const rank = sorted.findIndex(x => x.i === i);
+                                color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    { offset: 0, color: topColors[rank] },
+                                    { offset: 1, color: '#1a2d4a' }
+                                ]);
+                                shadowBlur = highlight ? 25 : 15;
+                                shadowColor = topColors[rank];
+                            } else {
+                                color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    { offset: 0, color: '#7eb8da' },
+                                    { offset: 1, color: '#1a2d4a' }
+                                ]);
+                                shadowBlur = 0;
+                                shadowColor = 'transparent';
+                            }
+                            return {
+                                value: v,
+                                itemStyle: { color, borderRadius: [8, 8, 0, 0], shadowBlur, shadowColor }
+                            };
+                        })
+                    }]
+                });
+                highlight = !highlight;
+            }, 1500);
         }
 
         // ========== 4. 月度趋势对比 ==========
@@ -262,27 +372,31 @@
             const data2026 = months.map(m => dashboardData.monthly_data['2026']?.[m]?.total || 0);
             
             const option = {
-                tooltip: { trigger: 'axis' },
-                legend: { data: ['2025年', '2026年'], textStyle: { color: '#8a9cc2' } },
+                tooltip: { trigger: 'axis', textStyle: { fontSize: 14 } },
+                legend: { data: ['2025年', '2026年'], textStyle: { color: '#8a9cc2', fontSize: 14 } },
                 grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-                xAxis: { type: 'category', data: months, axisLabel: { color: '#c8d4e8' } },
-                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2' } },
+                xAxis: { type: 'category', data: months, axisLabel: { color: '#c8d4e8', fontSize: 12 } },
+                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: 12 } },
                 series: [
                     { 
                         name: '2025年', 
                         type: 'line', 
                         data: data2025, 
                         smooth: true, 
-                        lineStyle: { color: '#64748b' }, 
-                        itemStyle: { color: '#64748b' } 
+                        lineStyle: { color: '#64748b', width: 3 }, 
+                        itemStyle: { color: '#64748b' },
+                        symbol: 'circle',
+                        symbolSize: 8
                     },
                     { 
                         name: '2026年', 
                         type: 'line', 
                         data: data2026, 
                         smooth: true, 
-                        lineStyle: { color: '#4a90d9' }, 
+                        lineStyle: { color: '#4a90d9', width: 3 }, 
                         itemStyle: { color: '#4a90d9' },
+                        symbol: 'circle',
+                        symbolSize: 8,
                         areaStyle: { 
                             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                                 { offset: 0, color: 'rgba(74,144,217,0.3)' }, 
@@ -301,31 +415,47 @@
             const chart = echarts.init(document.getElementById('deptYoyChart'));
             const monthName = currentMonth + '月';
             const yoyValues = dashboardData.department_yoy?.[monthName] || [];
-            
-            // 从 department_stats 获取科室名称
             const depts = dashboardData.department_stats?.departments || [];
+            
+            // 找出增长前三和下降前三
+            const sorted = yoyValues.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v);
+            const topGrowth = new Set(sorted.filter(x => x.v > 0).slice(0, 3).map(x => x.i));
+            const topDrop = new Set(sorted.filter(x => x.v < 0).slice(-3).map(x => x.i));
             
             const option = {
                 tooltip: { 
                     trigger: 'axis', 
                     axisPointer: { type: 'shadow' },
+                    textStyle: { fontSize: 14 },
                     formatter: function(params) {
                         const d = params[0];
                         return d.name + '<br/>同比: ' + (d.value >= 0 ? '+' : '') + d.value + '篇';
                     }
                 },
                 grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },
-                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: 10, rotate: 30 } },
-                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2' } },
+                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: 11, rotate: 30 } },
+                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: 12 } },
                 series: [{
                     type: 'bar',
-                    data: yoyValues.map(v => ({ 
-                        value: v, 
-                        itemStyle: { color: v >= 0 ? '#22c55e' : '#ef4444' } 
-                    })),
-                    barWidth: '45%',
-                    label: { show: true, position: 'top', color: '#fff', fontSize: 11, fontWeight: 'bold', formatter: '{c}' }
-                }]
+                    data: yoyValues.map((v, i) => {
+                        let color = v >= 0 ? '#22c55e' : '#ef4444';
+                        let shadowBlur = 0;
+                        if (topGrowth.has(i)) {
+                            shadowBlur = 15;
+                        } else if (topDrop.has(i)) {
+                            shadowBlur = 15;
+                        }
+                        return { 
+                            value: v, 
+                            itemStyle: { color, borderRadius: [6, 6, 0, 0], shadowBlur, shadowColor: color } 
+                        };
+                    }),
+                    barWidth: '50%',
+                    label: { show: true, position: 'top', color: '#fff', fontSize: 13, fontWeight: 'bold', formatter: '{c}' },
+                    animationDelay: (idx) => idx * 50,
+                    animationEasing: 'elasticOut'
+                }],
+                animationDuration: 1500
             };
             chart.setOption(option);
             window.addEventListener('resize', () => chart.resize());
@@ -342,7 +472,7 @@
             
             const yoy = dashboardData.monthly_yoy_totals?.[monthName] || dashboardData.year_over_year[monthName]?.total || 0;
             const yoyElem = document.getElementById('yearOverYear');
-            yoyElem.textContent = (yoy >= 0 ? '+' : '') + yoy;  // 同比是篇数差，不是百分比
+            yoyElem.textContent = (yoy >= 0 ? '+' : '') + yoy;
             yoyElem.style.color = yoy >= 0 ? '#22c55e' : '#ef4444';
         }
 
@@ -362,7 +492,6 @@
         // ========== 页面加载完成后初始化 ==========
         window.addEventListener('DOMContentLoaded', () => {
             initCharts();
-            // 更新时间
             setInterval(() => {
                 document.getElementById('datetime').textContent = new Date().toLocaleString('zh-CN');
             }, 1000);
