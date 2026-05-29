@@ -6,8 +6,777 @@
     <title>2026年地服部宣传数据可视化看板</title>
     <!-- ECharts -->
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    
+
     <!-- 数字动画 -->
     <script src="https://cdn.jsdelivr.net/npm/countup.js@2.3.2/dist/countUp.umd.min.js"></script>
+    <script>
+        const dashboardData = {
+    "platform_distribution": {
+        "platforms": [
+            "内部媒体",
+            "行业媒体",
+            "主流媒体",
+            "公众号",
+            "视频号"
+        ],
+        "values": [
+            36,
+            4,
+            38,
+            16,
+            0
+        ],
+        "percentages": [
+            38.3,
+            4.3,
+            40.4,
+            17.0
+        ]
+    },
+    "department_stats": {
+        "departments": [
+            "虹桥值机",
+            "虹桥高端服务室",
+            "虹桥服务室",
+            "浦东值机室",
+            "浦东高端服务室",
+            "浦东服务室",
+            "客机保障室",
+            "货机保障室",
+            "勤务保障室",
+            "运行管理室",
+            "经营管理室",
+            "安全管理室"
+        ],
+        "values": [
+            61,
+            50,
+            37,
+            53,
+            47,
+            39,
+            31,
+            13,
+            8,
+            18,
+            36,
+            3
+        ]
+    },
+    "monthly_data": {
+        "2025": {
+            "1月": {
+                "total": 7,
+                "departments": [
+                    9,
+                    10,
+                    10,
+                    11,
+                    8,
+                    6,
+                    4,
+                    3,
+                    4,
+                    4,
+                    0
+                ]
+            },
+            "2月": {
+                "total": 3,
+                "departments": [
+                    14,
+                    3,
+                    12,
+                    18,
+                    4,
+                    4,
+                    2,
+                    1,
+                    10,
+                    2,
+                    1
+                ]
+            },
+            "3月": {
+                "total": 2,
+                "departments": [
+                    1,
+                    9,
+                    14,
+                    12,
+                    5,
+                    4,
+                    7,
+                    3,
+                    1,
+                    3,
+                    0
+                ]
+            },
+            "4月": {
+                "total": 5,
+                "departments": [
+                    3,
+                    3,
+                    5,
+                    9,
+                    5,
+                    6,
+                    1,
+                    2,
+                    2,
+                    5,
+                    1
+                ]
+            },
+            "5月": {
+                "total": 9,
+                "departments": [
+                    7,
+                    5,
+                    6,
+                    7,
+                    5,
+                    5,
+                    0,
+                    3,
+                    8,
+                    5,
+                    1
+                ]
+            },
+            "6月": {
+                "total": 4,
+                "departments": [
+                    4,
+                    6,
+                    13,
+                    12,
+                    8,
+                    3,
+                    1,
+                    0,
+                    8,
+                    9,
+                    1
+                ]
+            },
+            "7月": {
+                "total": 3,
+                "departments": [
+                    0,
+                    4,
+                    2,
+                    3,
+                    3,
+                    1,
+                    1,
+                    1,
+                    0,
+                    4,
+                    0
+                ]
+            },
+            "8月": {
+                "total": 45,
+                "departments": [
+                    42,
+                    45,
+                    3,
+                    3,
+                    3,
+                    44,
+                    4,
+                    4,
+                    0,
+                    46,
+                    1
+                ]
+            },
+            "9月": {
+                "total": 9,
+                "departments": [
+                    11,
+                    8,
+                    4,
+                    4,
+                    4,
+                    2,
+                    1,
+                    1,
+                    3,
+                    12,
+                    2
+                ]
+            },
+            "10月": {
+                "total": 11,
+                "departments": [
+                    8,
+                    2,
+                    12,
+                    9,
+                    7,
+                    3,
+                    2,
+                    2,
+                    0,
+                    3,
+                    1
+                ]
+            },
+            "11月": {
+                "total": 15,
+                "departments": [
+                    12,
+                    3,
+                    19,
+                    17,
+                    8,
+                    1,
+                    2,
+                    0,
+                    1,
+                    2,
+                    1
+                ]
+            },
+            "12月": {
+                "total": 5,
+                "departments": [
+                    5,
+                    0,
+                    4,
+                    5,
+                    4,
+                    6,
+                    3,
+                    3,
+                    2,
+                    11,
+                    1
+                ]
+            }
+        },
+        "2026": {
+            "1月": {
+                "total": 19,
+                "departments": [
+                    11,
+                    7,
+                    7,
+                    10,
+                    4,
+                    6,
+                    10,
+                    7,
+                    2,
+                    3,
+                    4
+                ],
+                "platform": {
+                    "内部媒体": 8,
+                    "公众号": 1,
+                    "行业媒体": 1,
+                    "主流媒体": 2
+                }
+            },
+            "2月": {
+                "total": 28,
+                "departments": [
+                    22,
+                    19,
+                    13,
+                    19,
+                    17,
+                    13,
+                    12,
+                    1,
+                    1,
+                    7,
+                    14
+                ],
+                "platform": {
+                    "主流媒体": 16,
+                    "内部媒体": 8,
+                    "公众号": 3,
+                    "行业媒体": 1
+                }
+            },
+            "3月": {
+                "total": 24,
+                "departments": [
+                    15,
+                    15,
+                    8,
+                    14,
+                    14,
+                    9,
+                    5,
+                    2,
+                    1,
+                    9,
+                    8
+                ],
+                "platform": {
+                    "内部媒体": 7,
+                    "主流媒体": 10,
+                    "公众号": 6,
+                    "行业媒体": 1
+                }
+            },
+            "4月": {
+                "total": 19,
+                "departments": [
+                    13,
+                    10,
+                    10,
+                    9,
+                    11,
+                    9,
+                    3,
+                    2,
+                    3,
+                    0,
+                    8
+                ],
+                "platform": {
+                    "内部媒体": 9,
+                    "公众号": 3,
+                    "主流媒体": 6,
+                    "行业媒体": 1
+                }
+            },
+            "5月": {
+                "total": 11,
+                "departments": [
+                    4,
+                    2,
+                    3,
+                    5,
+                    4,
+                    6,
+                    3,
+                    1,
+                    1,
+                    1,
+                    6
+                ],
+                "platform": {
+                    "主流媒体": 3,
+                    "内部媒体": 4,
+                    "公众号": 3
+                }
+            },
+            "6月": {
+                "total": 0,
+                "departments": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                ],
+                "platform": {}
+            },
+            "7月": {
+                "total": 0,
+                "departments": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                ],
+                "platform": {}
+            },
+            "8月": {
+                "total": 0,
+                "departments": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                ],
+                "platform": {}
+            },
+            "9月": {
+                "total": 0,
+                "departments": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                ],
+                "platform": {}
+            },
+            "10月": {
+                "total": 0,
+                "departments": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                ],
+                "platform": {}
+            },
+            "11月": {
+                "total": 0,
+                "departments": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                ],
+                "platform": {}
+            },
+            "12月": {
+                "total": 0,
+                "departments": [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                ],
+                "platform": {}
+            }
+        }
+    },
+    "year_over_year": {
+        "1月": {
+            "total": 12,
+            "departments": [
+                2,
+                -3,
+                -3,
+                -1,
+                -4,
+                0,
+                6,
+                4,
+                -2,
+                -1,
+                4
+            ]
+        },
+        "2月": {
+            "total": 25,
+            "departments": [
+                8,
+                16,
+                1,
+                1,
+                13,
+                9,
+                10,
+                0,
+                -9,
+                5,
+                13
+            ]
+        },
+        "3月": {
+            "total": 22,
+            "departments": [
+                14,
+                6,
+                -6,
+                2,
+                9,
+                5,
+                -2,
+                -1,
+                0,
+                6,
+                8
+            ]
+        },
+        "4月": {
+            "total": 14,
+            "departments": [
+                10,
+                7,
+                5,
+                0,
+                6,
+                3,
+                2,
+                0,
+                1,
+                -5,
+                7
+            ]
+        },
+        "5月": {
+            "total": 2,
+            "departments": [
+                -3,
+                -3,
+                -3,
+                -2,
+                -1,
+                1,
+                3,
+                -2,
+                -7,
+                -4,
+                5
+            ]
+        },
+        "6月": {
+            "total": -4,
+            "departments": [
+                -4,
+                -6,
+                -13,
+                -12,
+                -8,
+                -3,
+                -1,
+                0,
+                -8,
+                -9,
+                -1
+            ]
+        },
+        "7月": {
+            "total": -3,
+            "departments": [
+                0,
+                -4,
+                -2,
+                -3,
+                -3,
+                -1,
+                -1,
+                -1,
+                0,
+                -4,
+                0
+            ]
+        },
+        "8月": {
+            "total": -45,
+            "departments": [
+                -42,
+                -45,
+                -3,
+                -3,
+                -3,
+                -44,
+                -4,
+                -4,
+                0,
+                -46,
+                -1
+            ]
+        },
+        "9月": {
+            "total": -9,
+            "departments": [
+                -11,
+                -8,
+                -4,
+                -4,
+                -4,
+                -2,
+                -1,
+                -1,
+                -3,
+                -12,
+                -2
+            ]
+        },
+        "10月": {
+            "total": -11,
+            "departments": [
+                -8,
+                -2,
+                -12,
+                -9,
+                -7,
+                -3,
+                -2,
+                -2,
+                0,
+                -3,
+                -1
+            ]
+        },
+        "11月": {
+            "total": -15,
+            "departments": [
+                -12,
+                -3,
+                -19,
+                -17,
+                -8,
+                -1,
+                -2,
+                0,
+                -1,
+                -2,
+                -1
+            ]
+        },
+        "12月": {
+            "total": -5,
+            "departments": [
+                -5,
+                0,
+                -4,
+                -5,
+                -4,
+                -6,
+                -3,
+                -3,
+                -2,
+                -11,
+                -1
+            ]
+        }
+    },
+    "quarter_yoy": {
+        "一季度": {
+            "2025": 12,
+            "2026": 71,
+            "yoy": 59
+        },
+        "二季度": {
+            "2025": 18,
+            "2026": 30,
+            "yoy": 12
+        },
+        "三季度": {
+            "2025": 57,
+            "2026": 0,
+            "yoy": -57
+        },
+        "四季度": {
+            "2025": 31,
+            "2026": 0,
+            "yoy": -31
+        }
+    },
+    "summary": {
+        "total_articles": 94,
+        "monthly_avg": 7.83,
+        "current_month_articles": 11,
+        "current_year": 2026,
+        "current_month": 5
+    },
+    "current_month_platform": {
+        "主流媒体": 3,
+        "内部媒体": 4,
+        "公众号": 3
+    },
+    "department_yoy": {
+        "5月": {
+            "虹桥值机": -5,
+            "虹桥高端服务室": -5,
+            "虹桥服务室": -2,
+            "浦东值机室": -1,
+            "浦东高端服务室": -3,
+            "浦东服务室": 1,
+            "客机保障室": -2,
+            "货机保障室": 1,
+            "勤务保障室": -2,
+            "运行管理室": -7,
+            "经营管理室": 1,
+            "安全管理室": 0
+        }
+    },
+    "monthly_platform": {
+        "1": {
+            "内部媒体": 8,
+            "公众号": 1,
+            "行业媒体": 1,
+            "主流媒体": 2
+        },
+        "2": {
+            "主流媒体": 16,
+            "内部媒体": 8,
+            "公众号": 3,
+            "行业媒体": 1
+        },
+        "3": {
+            "内部媒体": 7,
+            "主流媒体": 10,
+            "公众号": 6,
+            "行业媒体": 1
+        },
+        "4": {
+            "内部媒体": 9,
+            "公众号": 3,
+            "主流媒体": 6,
+            "行业媒体": 1
+        },
+        "5": {
+            "主流媒体": 3,
+            "内部媒体": 4,
+            "公众号": 3
+        },
+        "6": {},
+        "7": {},
+        "8": {},
+        "9": {},
+        "10": {},
+        "11": {},
+        "12": {}
+    }
+};
+    </script>
+
+    
+
     <style>
         * {
             margin: 0;
@@ -239,6 +1008,11 @@
             grid-column: span 2;
         }
 
+        /* 当月明细 */
+        .detail-card {
+            grid-column: span 2;
+        }
+
         /* 月度趋势 - 大卡片 */
         .monthly-card {
             grid-column: span 4;
@@ -325,7 +1099,7 @@
                 grid-column: span 1;
                 grid-template-columns: repeat(2, 1fr);
             }
-            .platform-card, .monthly-dept-card, .dept-yoy-card {
+            .platform-card, .monthly-dept-card, .dept-yoy-card, .detail-card {
                 grid-column: span 1;
                 grid-row: span 1;
             }
@@ -415,7 +1189,10 @@
             <div class="chart-container" id="deptYoyChart" style="height: 280px;"></div>
         </div>
 
-            <div class="chart-container" id="deptYoyChart" style="height: 280px;"></div>
+        <!-- 当月详情 -->
+        <div class="card detail-card">
+            <div class="card-title" id="detailTitle">📋 5月平台明细</div>
+            <div class="chart-container" id="detailChart" style="height: 280px;"></div>
         </div>
 
         <!-- 月度趋势对比 -->
@@ -1368,6 +2145,7 @@
             initYearlyDeptChart();
             initMonthlyChart();
             initDeptYoyChart();
+            initDetailChart();
         }
 
         // 平台分布饼图
@@ -1748,6 +2526,74 @@
             window.addEventListener('resize', () => chart.resize());
         }
 
+        // 当月平台明细
+        function initDetailChart() {
+            const chart = echarts.init(document.getElementById('detailChart'));
+            
+            // 根据当前选择的月份获取平台数据
+            const monthName = currentMonth + '月';
+            let platformData = {};
+            
+            // 从 monthly_data 中获取当前月份的平台数据
+            if (dashboardData.monthly_data['2026']?.[monthName]?.platform) {
+                platformData = dashboardData.monthly_data['2026'][monthName].platform;
+            } else {
+                // 回退到 current_month_platform
+                platformData = dashboardData.current_month_platform || {};
+            }
+            
+            const platforms = Object.keys(platformData);
+            const values = Object.values(platformData);
+
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' },
+                    backgroundColor: 'rgba(20, 28, 40, 0.95)',
+                    borderColor: '#7eb8da',
+                    borderWidth: 1,
+                    textStyle: { color: '#c8d4e8' }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '15%',
+                    top: '5%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: platforms,
+                    axisLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.3)' } },
+                    axisLabel: { color: '#c8d4e8', fontSize: 10, rotate: 20 }
+                },
+                yAxis: {
+                    type: 'value',
+                    scale: true,
+                    minInterval: 1,
+                    axisLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.3)' } },
+                    axisLabel: { color: '#8a9cc2' },
+                    splitLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.2)', type: 'dashed' } }
+                },
+                series: [{
+                    type: 'bar',
+                    data: values.map(v => ({
+                        value: v,
+                        itemStyle: {
+                            color: v > 0
+                                ? new echarts.graphic.LinearGradient(0, 1, 0, 0, [
+                                    { offset: 0, color: 'rgba(74, 144, 217, 0.3)' },
+                                    { offset: 1, color: '#4a90d9' }
+                                ])
+                                : 'rgba(74, 144, 217, 0.15)',
+                            borderRadius: [6, 6, 0, 0]
+                        }
+                    })),
+                    barWidth: '45%',
+                    animationDuration: 800
+                }]
+            };
+            chart.setOption(option);
             window.addEventListener('resize', () => chart.resize());
         }
 
@@ -1805,6 +2651,7 @@
             const monthName = currentMonth + '月';
             document.getElementById('monthlyDeptTitle').textContent = '🏆 ' + monthName + '科室稿件排名';
             document.getElementById('deptYoyTitle').textContent = '📊 ' + monthName + '科室同比';
+            document.getElementById('detailTitle').textContent = '📋 ' + monthName + '平台明细';
             document.getElementById('currentMonthTitle').textContent = monthName + '稿件';
             
             // 更新当月稿件数
@@ -1818,6 +2665,7 @@
             // 重新初始化所有受月份影响的图表
             initMonthlyDeptChart();  // 月度科室排名
             initDeptYoyChart();       // 科室同比
+            initDetailChart();        // 平台明细
 
             // 更新月度趋势图表高亮当前月份
             const monthlyChart = echarts.getInstanceByDom(document.getElementById('monthlyChart'));
