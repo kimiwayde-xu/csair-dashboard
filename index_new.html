@@ -334,9 +334,9 @@
             const monthData = dashboardData.monthly_data[currentYear]?.[monthName];
             document.getElementById('currentMonthArticles').textContent = monthData ? monthData.total : '-';
             
-            const yoy = dashboardData.year_over_year[monthName]?.total || 0;
+            const yoy = dashboardData.monthly_yoy_totals?.[monthName] || dashboardData.year_over_year[monthName]?.total || 0;
             const yoyElem = document.getElementById('yearOverYear');
-            yoyElem.textContent = (yoy >= 0 ? '+' : '') + yoy + '%';
+            yoyElem.textContent = (yoy >= 0 ? '+' : '') + yoy;  // 同比是篇数差，不是百分比
             yoyElem.style.color = yoy >= 0 ? '#22c55e' : '#ef4444';
         }
 
