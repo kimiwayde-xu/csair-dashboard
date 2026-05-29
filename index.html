@@ -989,8 +989,9 @@
         // 全年科室排名
         function initYearlyDeptChart() {
             const chart = echarts.init(document.getElementById('yearlyDeptChart'));
-            const depts = Object.keys(dashboardData.department_stats || {});
-            const values = depts.map(d => dashboardData.department_stats[d]);
+            const deptData = dashboardData.department_stats;
+            const depts = deptData.departments;
+            const values = deptData.values;
             
             const option = {
                 tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
