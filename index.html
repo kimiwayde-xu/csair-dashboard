@@ -1295,9 +1295,10 @@
             chart.setOption(option);
             window.addEventListener('resize', () => chart.resize());
             
-            // 动态闪烁效果
+            // 动态闪烁效果（页面可见时运行）
             let highlight = true;
-            setInterval(() => {
+            let blinkInterval = setInterval(() => {
+                if (document.hidden) return;  // 页面不可见时跳过
                 chart.setOption({
                     series: [{
                         data: values.map((v, i) => {
