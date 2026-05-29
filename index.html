@@ -97,11 +97,7 @@
         <div class="control-group">
             <span class="control-label">月份:</span>
             <select id="monthSelect" onchange="updateDashboard()">
-                <option value="1">1月</option>
-                <option value="2">2月</option>
-                <option value="3">3月</option>
-                <option value="4">4月</option>
-                <option value="5" selected>5月</option>
+                <!-- 月份选项由JavaScript动态生成 -->
             </select>
         </div>
     </div>
@@ -1084,7 +1080,7 @@
                         itemStyle: { color: v >= 0 ? '#22c55e' : '#ef4444' } 
                     })),
                     barWidth: '45%',
-                    label: { show: true, position: 'top', color: '#fff', fontSize: 11, formatter: '{c}%' }
+                    label: { show: true, position: 'top', color: '#fff', fontSize: 11, formatter: '{c}' }  // 同比是篇数差，不是百分比
                 }]
             };
             chart.setOption(option);
@@ -1119,8 +1115,33 @@
             initDeptYoyChart();
         }
 
+        // ========== 动态生成月份选择器 ==========
+        function initMonthSelector() {
+            const select = document.getElementById('monthSelect');
+            select.innerHTML = '';  // 清空
+            
+            // 从2026年数据中获取有数据的月份
+            const months_2026 = dashboardData.monthly_data['2026'] || {}; 
+            const months = Object.keys(months_2026).filter(m => months_2026[m]['total'] > 0);
+            
+            // 按月份排序
+            months.sort((a, b) => parseInt(a) - parseInt(b));
+            
+            // 生成option
+            months.forEach((m, i) => {
+                const opt = document.createElement('option');
+                opt.value = parseInt(m);
+                opt.textContent = m;
+                if (i === months.length - 1) opt.selected = true;  // 默认选最后一个（最新月份）
+                select.appendChild(opt);
+            });
+            
+            currentMonth = parseInt(select.value);
+        }
+
         // ========== 页面加载完成后初始化 ==========
         window.addEventListener('DOMContentLoaded', () => {
+            initMonthSelector();  // 先初始化月份选择器
             initCharts();
             // 更新时间
             setInterval(() => {
