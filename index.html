@@ -2530,6 +2530,14 @@
         function updateUpdateTime() {
             document.getElementById('updateTime').textContent = new Date().toLocaleString('zh-CN');
         }
+
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            updateUpdateTime();
+            // 定时更新时间
+            setInterval(updateUpdateTime, 60000);
+        });
     </script>
 </body>
 </html>
