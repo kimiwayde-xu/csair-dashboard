@@ -924,11 +924,11 @@
 
         // 初始化所有图表
         function initCharts() {
-            initPlatformChart();
-            initMonthlyDeptChart();
-            initYearlyDeptChart();
-            initMonthlyChart();
-            initDeptYoyChart();
+            try { initPlatformChart(); } catch(e) { console.error('平台分布图错误:', e); }
+            try { initMonthlyDeptChart(); } catch(e) { console.error('月度科室排名错误:', e); }
+            try { initYearlyDeptChart(); } catch(e) { console.error('全年科室排名错误:', e); }
+            try { initMonthlyChart(); } catch(e) { console.error('月度趋势错误:', e); }
+            try { initDeptYoyChart(); } catch(e) { console.error('科室同比错误:', e); }
             updateMetrics();
         }
 
