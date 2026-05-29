@@ -10,6 +10,339 @@
 
     <!-- 数字动画 -->
     <script src="https://cdn.jsdelivr.net/npm/countup.js@2.3.2/dist/countUp.umd.min.js"></script>
+    
+
+    
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0a0e17 0%, #141c28 50%, #0a0e17 100%);
+            min-height: 100vh;
+            color: #c8d4e8;
+            overflow-x: hidden;
+        }
+
+        /* 标题区 */
+        .header {
+            background: linear-gradient(90deg, #1a2d4a 0%, #3d6b99 50%, #1a2d4a 100%);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #4a90d9;
+            box-shadow: 0 4px 30px rgba(74, 144, 217, 0.2);
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(74, 144, 217, 0.6);
+            letter-spacing: 4px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .datetime {
+            font-size: 20px;
+            color: #7eb8da;
+            font-weight: 500;
+        }
+
+        /* 控制栏 */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 15px;
+            background: rgba(20, 28, 40, 0.6);
+            border-bottom: 1px solid rgba(74, 144, 217, 0.2);
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-label {
+            color: #8a9cc2;
+            font-size: 16px;
+        }
+
+        select {
+            background: rgba(20, 28, 40, 0.8);
+            border: 1px solid rgba(74, 144, 217, 0.4);
+            color: #7eb8da;
+            padding: 10px 18px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        select:hover {
+            border-color: #7eb8da;
+            box-shadow: 0 0 10px rgba(126, 184, 218, 0.3);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #7eb8da;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #4a90d9, #7eb8da);
+            border: none;
+            color: #fff;
+            padding: 10px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 144, 217, 0.4);
+        }
+
+        /* 主内容区 */
+        .main-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* 卡片通用样式 */
+        .card {
+            background: rgba(20, 28, 40, 0.85);
+            border: 1px solid rgba(74, 144, 217, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+            backdrop-filter: blur(20px);
+            animation: fadeIn 0.5s ease-out;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .card:hover {
+            border-color: rgba(74, 144, 217, 0.6);
+            box-shadow: 0 8px 32px rgba(74, 144, 217, 0.15);
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-title {
+            font-size: 16px;
+            color: #778da9;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            background: #7eb8da;
+            border-radius: 2px;
+        }
+
+        /* 核心指标卡片 */
+        .metric-cards {
+            grid-column: span 4;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .metric-card {
+            text-align: center;
+            padding: 25px 15px;
+        }
+
+        .metric-value {
+            font-size: 56px;
+            font-weight: 700;
+            color: #7eb8da;
+            line-height: 1;
+            margin: 12px 0;
+            font-family: 'DIN Alternate', sans-serif;
+        }
+
+        .metric-value.positive {
+            color: #52c41a;
+        }
+
+        .metric-value.negative {
+            color: #ff6b6b;
+        }
+
+        .metric-unit {
+            font-size: 14px;
+            color: #778da9;
+        }
+
+        .metric-trend {
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .trend-up {
+            color: #52c41a;
+        }
+
+        .trend-down {
+            color: #ff6b6b;
+        }
+
+        /* 图表容器 */
+        .chart-container {
+            min-height: 300px;
+        }
+
+        /* 月度科室排名 - 左侧大卡 */
+        .monthly-dept-card {
+            grid-column: span 2;
+            grid-row: span 1;
+        }
+
+        /* 平台分布 - 右侧大卡 */
+        .platform-card {
+            grid-column: span 2;
+            grid-row: span 1;
+        }
+
+        /* 科室同比 */
+        .dept-yoy-card {
+            grid-column: span 2;
+        }
+
+        /* 当月明细 */
+        .detail-card {
+            grid-column: span 2;
+        }
+
+        /* 月度趋势 - 大卡片 */
+        .monthly-card {
+            grid-column: span 4;
+        }
+
+        /* 全年科室排名 - 底部 */
+        .yearly-dept-card {
+            grid-column: span 4;
+        }
+
+        .monthly-chart {
+            height: 200px;
+        }
+
+        /* 底部信息 */
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: #8a9cc2;
+            font-size: 12px;
+            border-top: 1px solid rgba(74, 144, 217, 0.2);
+        }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(20, 28, 40, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(74, 144, 217, 0.4);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #7eb8da;
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+        }
+
+        .loading::after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 3px solid #415a77;
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 响应式 */
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .metric-cards {
+                grid-column: span 2;
+            }
+            .monthly-card, .articles-card {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+            .metric-cards {
+                grid-column: span 1;
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .platform-card, .monthly-dept-card, .dept-yoy-card, .detail-card {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+        }
+    </style>
+    
     <script>
         const dashboardData = {
     "platform_distribution": {
@@ -774,338 +1107,7 @@
     }
 };
     </script>
-
-    
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #0a0e17 0%, #141c28 50%, #0a0e17 100%);
-            min-height: 100vh;
-            color: #c8d4e8;
-            overflow-x: hidden;
-        }
-
-        /* 标题区 */
-        .header {
-            background: linear-gradient(90deg, #1a2d4a 0%, #3d6b99 50%, #1a2d4a 100%);
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #4a90d9;
-            box-shadow: 0 4px 30px rgba(74, 144, 217, 0.2);
-        }
-
-        .header h1 {
-            font-size: 36px;
-            font-weight: 600;
-            color: #fff;
-            text-shadow: 0 0 20px rgba(74, 144, 217, 0.6);
-            letter-spacing: 4px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .datetime {
-            font-size: 20px;
-            color: #7eb8da;
-            font-weight: 500;
-        }
-
-        /* 控制栏 */
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            padding: 15px;
-            background: rgba(20, 28, 40, 0.6);
-            border-bottom: 1px solid rgba(74, 144, 217, 0.2);
-        }
-
-        .control-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .control-label {
-            color: #8a9cc2;
-            font-size: 16px;
-        }
-
-        select {
-            background: rgba(20, 28, 40, 0.8);
-            border: 1px solid rgba(74, 144, 217, 0.4);
-            color: #7eb8da;
-            padding: 10px 18px;
-            font-size: 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        select:hover {
-            border-color: #7eb8da;
-            box-shadow: 0 0 10px rgba(126, 184, 218, 0.3);
-        }
-
-        select:focus {
-            outline: none;
-            border-color: #7eb8da;
-        }
-
-        .refresh-btn {
-            background: linear-gradient(135deg, #4a90d9, #7eb8da);
-            border: none;
-            color: #fff;
-            padding: 10px 24px;
-            font-size: 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .refresh-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(74, 144, 217, 0.4);
-        }
-
-        /* 主内容区 */
-        .main-container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            padding: 20px;
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-
-        /* 卡片通用样式 */
-        .card {
-            background: rgba(20, 28, 40, 0.85);
-            border: 1px solid rgba(74, 144, 217, 0.3);
-            border-radius: 12px;
-            padding: 20px;
-            transition: all 0.3s;
-            backdrop-filter: blur(20px);
-            animation: fadeIn 0.5s ease-out;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .card:hover {
-            border-color: rgba(74, 144, 217, 0.6);
-            box-shadow: 0 8px 32px rgba(74, 144, 217, 0.15);
-            transform: translateY(-2px);
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .card-title {
-            font-size: 16px;
-            color: #778da9;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .card-title::before {
-            content: '';
-            width: 3px;
-            height: 14px;
-            background: #7eb8da;
-            border-radius: 2px;
-        }
-
-        /* 核心指标卡片 */
-        .metric-cards {
-            grid-column: span 4;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-        }
-
-        .metric-card {
-            text-align: center;
-            padding: 25px 15px;
-        }
-
-        .metric-value {
-            font-size: 56px;
-            font-weight: 700;
-            color: #7eb8da;
-            line-height: 1;
-            margin: 12px 0;
-            font-family: 'DIN Alternate', sans-serif;
-        }
-
-        .metric-value.positive {
-            color: #52c41a;
-        }
-
-        .metric-value.negative {
-            color: #ff6b6b;
-        }
-
-        .metric-unit {
-            font-size: 14px;
-            color: #778da9;
-        }
-
-        .metric-trend {
-            font-size: 14px;
-            margin-top: 8px;
-        }
-
-        .trend-up {
-            color: #52c41a;
-        }
-
-        .trend-down {
-            color: #ff6b6b;
-        }
-
-        /* 图表容器 */
-        .chart-container {
-            min-height: 300px;
-        }
-
-        /* 月度科室排名 - 左侧大卡 */
-        .monthly-dept-card {
-            grid-column: span 2;
-            grid-row: span 1;
-        }
-
-        /* 平台分布 - 右侧大卡 */
-        .platform-card {
-            grid-column: span 2;
-            grid-row: span 1;
-        }
-
-        /* 科室同比 */
-        .dept-yoy-card {
-            grid-column: span 2;
-        }
-
-        /* 当月明细 */
-        .detail-card {
-            grid-column: span 2;
-        }
-
-        /* 月度趋势 - 大卡片 */
-        .monthly-card {
-            grid-column: span 4;
-        }
-
-        /* 全年科室排名 - 底部 */
-        .yearly-dept-card {
-            grid-column: span 4;
-        }
-
-        .monthly-chart {
-            height: 200px;
-        }
-
-        /* 底部信息 */
-        .footer {
-            text-align: center;
-            padding: 15px;
-            color: #8a9cc2;
-            font-size: 12px;
-            border-top: 1px solid rgba(74, 144, 217, 0.2);
-        }
-
-        /* 滚动条美化 */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(20, 28, 40, 0.5);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(74, 144, 217, 0.4);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #7eb8da;
-        }
-
-        /* 加载动画 */
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 300px;
-        }
-
-        .loading::after {
-            content: '';
-            width: 40px;
-            height: 40px;
-            border: 3px solid #415a77;
-            border-top-color: #00d4ff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* 响应式 */
-        @media (max-width: 1200px) {
-            .main-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .metric-cards {
-                grid-column: span 2;
-            }
-            .monthly-card, .articles-card {
-                grid-column: span 2;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .main-container {
-                grid-template-columns: 1fr;
-            }
-            .metric-cards {
-                grid-column: span 1;
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .platform-card, .monthly-dept-card, .dept-yoy-card, .detail-card {
-                grid-column: span 1;
-                grid-row: span 1;
-            }
-        }
-    </style>
-</head>
+    </head>
 <body>
     <!-- 标题区 -->
     <header class="header">
@@ -1189,11 +1191,7 @@
             <div class="chart-container" id="deptYoyChart" style="height: 280px;"></div>
         </div>
 
-        <!-- 当月详情 -->
-        <div class="card detail-card">
-            <div class="card-title" id="detailTitle">📋 5月平台明细</div>
-            <div class="chart-container" id="detailChart" style="height: 280px;"></div>
-        </div>
+
 
         <!-- 月度趋势对比 -->
         <div class="card monthly-card">
@@ -2526,157 +2524,6 @@
             window.addEventListener('resize', () => chart.resize());
         }
 
-        // 当月平台明细
-        function initDetailChart() {
-            const chart = echarts.init(document.getElementById('detailChart'));
-            
-            // 根据当前选择的月份获取平台数据
-            const monthName = currentMonth + '月';
-            let platformData = {};
-            
-            // 从 monthly_data 中获取当前月份的平台数据
-            if (dashboardData.monthly_data['2026']?.[monthName]?.platform) {
-                platformData = dashboardData.monthly_data['2026'][monthName].platform;
-            } else {
-                // 回退到 current_month_platform
-                platformData = dashboardData.current_month_platform || {};
-            }
-            
-            const platforms = Object.keys(platformData);
-            const values = Object.values(platformData);
-
-            const option = {
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: { type: 'shadow' },
-                    backgroundColor: 'rgba(20, 28, 40, 0.95)',
-                    borderColor: '#7eb8da',
-                    borderWidth: 1,
-                    textStyle: { color: '#c8d4e8' }
-                },
-                grid: {
-                    left: '3%',
-                    right: '4%',
-                    bottom: '15%',
-                    top: '5%',
-                    containLabel: true
-                },
-                xAxis: {
-                    type: 'category',
-                    data: platforms,
-                    axisLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.3)' } },
-                    axisLabel: { color: '#c8d4e8', fontSize: 10, rotate: 20 }
-                },
-                yAxis: {
-                    type: 'value',
-                    scale: true,
-                    minInterval: 1,
-                    axisLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.3)' } },
-                    axisLabel: { color: '#8a9cc2' },
-                    splitLine: { lineStyle: { color: 'rgba(74, 144, 217, 0.2)', type: 'dashed' } }
-                },
-                series: [{
-                    type: 'bar',
-                    data: values.map(v => ({
-                        value: v,
-                        itemStyle: {
-                            color: v > 0
-                                ? new echarts.graphic.LinearGradient(0, 1, 0, 0, [
-                                    { offset: 0, color: 'rgba(74, 144, 217, 0.3)' },
-                                    { offset: 1, color: '#4a90d9' }
-                                ])
-                                : 'rgba(74, 144, 217, 0.15)',
-                            borderRadius: [6, 6, 0, 0]
-                        }
-                    })),
-                    barWidth: '45%',
-                    animationDuration: 800
-                }]
-            };
-            chart.setOption(option);
-            window.addEventListener('resize', () => chart.resize());
-        }
-
-        // 更新核心指标
-        function updateMetrics() {
-            animateNumber('totalArticles', dashboardData.summary.total_articles);
-            animateNumber('monthlyAvg', dashboardData.summary.monthly_avg, 2);
-            animateNumber('currentMonthArticles', dashboardData.summary.current_month_articles);
-
-            const monthName = document.getElementById('monthSelect').value + '月';
-            const year = document.getElementById('yearSelect').value;
-            const yoyValue = dashboardData.year_over_year[monthName]?.total || 0;
-
-            const yoyElement = document.getElementById('yearOverYear');
-            yoyElement.textContent = yoyValue;
-            yoyElement.className = 'metric-value ' + (yoyValue >= 0 ? 'positive' : 'negative');
-
-            const trendElement = document.getElementById('trendText');
-            trendElement.innerHTML = yoyValue >= 0
-                ? '<span class="trend-up">↑ 同比上升</span>'
-                : '<span class="trend-down">↓ 同比下降</span>';
-        }
-
-        // 数字动画
-        function animateNumber(elementId, targetValue, decimals = 0) {
-            const element = document.getElementById(elementId);
-            const startValue = parseFloat(element.textContent) || 0;
-            const duration = 1000;
-            const startTime = performance.now();
-
-            function update(currentTime) {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const easeProgress = 1 - Math.pow(1 - progress, 3);
-                const currentValue = startValue + (targetValue - startValue) * easeProgress;
-
-                element.textContent = decimals > 0
-                    ? currentValue.toFixed(decimals)
-                    : Math.round(currentValue);
-
-                if (progress < 1) {
-                    requestAnimationFrame(update);
-                }
-            }
-
-            requestAnimationFrame(update);
-        }
-
-        // 更新看板
-        function updateDashboard() {
-            currentYear = parseInt(document.getElementById('yearSelect').value);
-            currentMonth = parseInt(document.getElementById('monthSelect').value);
-            
-            // 更新标题
-            const monthName = currentMonth + '月';
-            document.getElementById('monthlyDeptTitle').textContent = '🏆 ' + monthName + '科室稿件排名';
-            document.getElementById('deptYoyTitle').textContent = '📊 ' + monthName + '科室同比';
-            document.getElementById('detailTitle').textContent = '📋 ' + monthName + '平台明细';
-            document.getElementById('currentMonthTitle').textContent = monthName + '稿件';
-            
-            // 更新当月稿件数
-            const monthData = dashboardData.monthly_data[currentYear]?.[monthName];
-            if (monthData) {
-                dashboardData.summary.current_month_articles = monthData.total;
-            }
-            
-            updateMetrics();
-
-            // 重新初始化所有受月份影响的图表
-            initMonthlyDeptChart();  // 月度科室排名
-            initDeptYoyChart();       // 科室同比
-            initDetailChart();        // 平台明细
-
-            // 更新月度趋势图表高亮当前月份
-            const monthlyChart = echarts.getInstanceByDom(document.getElementById('monthlyChart'));
-            if (monthlyChart) {
-                monthlyChart.dispatchAction({
-                    type: 'showTip',
-                    seriesIndex: 1,
-                    dataIndex: currentMonth - 1
-                });
-            }
-        }
 
 
         // 更新数据时间
