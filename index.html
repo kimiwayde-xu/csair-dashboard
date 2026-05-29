@@ -958,9 +958,11 @@
             const monthData = dashboardData.monthly_data[currentYear]?.[monthName];
             if (!monthData) return;
             
-            // 注意：monthData.departments 是数组（已经是值），不是对象
-            const depts = dashboardData.department_stats.departments; // 科室名称
-            const values = monthData.departments; // 当月各科室稿件数（数组）
+            // 注意：monthData.departments 是数组（已经是值），长度可能比科室总数少
+            // 只取前N个科室，与数据长度匹配
+            const allDepts = dashboardData.department_stats.departments;
+            const values = monthData.departments;
+            const depts = allDepts.slice(0, values.length); // 只取数据对应的科室
             
             const option = {
                 tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
