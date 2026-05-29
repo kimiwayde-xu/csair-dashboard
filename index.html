@@ -44,6 +44,21 @@
             font-size: 14px;
             cursor: pointer;
         }
+        .metric-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .metric-card {
+            background: rgba(26, 45, 74, 0.6);
+            border: 1px solid rgba(74, 144, 217, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .metric-label { color: #8a9cc2; font-size: 14px; margin-bottom: 10px; }
+        .metric-value { color: #fff; font-size: 36px; font-weight: bold; }
         .dashboard {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -63,22 +78,6 @@
             font-weight: 600;
         }
         .chart-container { height: 280px; }
-        .metric-cards {
-            grid-column: span 4;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .metric-card {
-            background: rgba(26, 45, 74, 0.6);
-            border: 1px solid rgba(74, 144, 217, 0.2);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-        }
-        .metric-label { color: #8a9cc2; font-size: 14px; margin-bottom: 10px; }
-        .metric-value { color: #fff; font-size: 36px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -153,9 +152,8 @@
         </div>
     </div>
 
-
     <script>
-        // 数据
+        // ========== 数据定义 ==========
         const dashboardData = {
     "platform_distribution": {
         "platforms": [
@@ -922,7 +920,7 @@
         let currentYear = 2026;
         let currentMonth = 5;
 
-        // 初始化所有图表
+        // ========== 初始化所有图表 ==========
         function initCharts() {
             try { initPlatformChart(); } catch(e) { console.error('平台分布图错误:', e); }
             try { initMonthlyDeptChart(); } catch(e) { console.error('月度科室排名错误:', e); }
@@ -932,7 +930,7 @@
             updateMetrics();
         }
 
-        // 平台分布饼图
+        // ========== 1. 平台分布饼图 ==========
         function initPlatformChart() {
             const chart = echarts.init(document.getElementById('platformChart'));
             const d = dashboardData.platform_distribution;
@@ -953,15 +951,16 @@
             window.addEventListener('resize', () => chart.resize());
         }
 
-        // 月度科室排名
+        // ========== 2. 月度科室排名 ==========
         function initMonthlyDeptChart() {
             const chart = echarts.init(document.getElementById('monthlyDeptChart'));
             const monthName = currentMonth + '月';
             const monthData = dashboardData.monthly_data[currentYear]?.[monthName];
             if (!monthData) return;
             
-            const depts = monthData.departments;
-            const values = monthData.values;
+            // 注意：monthData.departments 是数组（已经是值），不是对象
+            const depts = dashboardData.department_stats.departments; // 科室名称
+            const values = monthData.departments; // 当月各科室稿件数（数组）
             
             const option = {
                 tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
@@ -986,7 +985,7 @@
             window.addEventListener('resize', () => chart.resize());
         }
 
-        // 全年科室排名
+        // ========== 3. 全年科室排名 ==========
         function initYearlyDeptChart() {
             const chart = echarts.init(document.getElementById('yearlyDeptChart'));
             const deptData = dashboardData.department_stats;
@@ -1016,7 +1015,7 @@
             window.addEventListener('resize', () => chart.resize());
         }
 
-        // 月度趋势对比
+        // ========== 4. 月度趋势对比 ==========
         function initMonthlyChart() {
             const chart = echarts.init(document.getElementById('monthlyChart'));
             const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
@@ -1058,14 +1057,15 @@
             window.addEventListener('resize', () => chart.resize());
         }
 
-        // 科室同比
+        // ========== 5. 科室同比 ==========
         function initDeptYoyChart() {
             const chart = echarts.init(document.getElementById('deptYoyChart'));
             const monthName = currentMonth + '月';
             const yoyData = dashboardData.department_yoy?.[monthName] || {};
             
+            // department_yoy 是对象 {科室名: 同比数值}
             const depts = Object.keys(yoyData);
-            const values = depts.map(d => yoyData[d]);
+            const values = Object.values(yoyData);
             
             const option = {
                 tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
@@ -1086,7 +1086,7 @@
             window.addEventListener('resize', () => chart.resize());
         }
 
-        // 更新指标卡片
+        // ========== 更新指标卡片 ==========
         function updateMetrics() {
             document.getElementById('totalArticles').textContent = dashboardData.summary.total_articles;
             document.getElementById('monthlyAvg').textContent = dashboardData.summary.monthly_avg.toFixed(2);
@@ -1101,20 +1101,20 @@
             yoyElem.style.color = yoy >= 0 ? '#22c55e' : '#ef4444';
         }
 
-        // 更新看板
+        // ========== 更新看板 ==========
         function updateDashboard() {
             currentYear = parseInt(document.getElementById('yearSelect').value);
             currentMonth = parseInt(document.getElementById('monthSelect').value);
             
             document.getElementById('monthlyDeptTitle').textContent = '🏆 ' + currentMonth + '月科室稿件排名';
-            document.getElementById('deptYoyTitle').textContent = '📊 ' + currentMonth + '月科室同比';
+            document.getElementById('deptYoyTitle').textContent = '📈 ' + currentMonth + '月科室同比';
             
             updateMetrics();
             initMonthlyDeptChart();
             initDeptYoyChart();
         }
 
-        // 页面加载完成后初始化
+        // ========== 页面加载完成后初始化 ==========
         window.addEventListener('DOMContentLoaded', () => {
             initCharts();
             // 更新时间
