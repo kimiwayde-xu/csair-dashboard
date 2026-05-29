@@ -300,25 +300,31 @@
         function initDeptYoyChart() {
             const chart = echarts.init(document.getElementById('deptYoyChart'));
             const monthName = currentMonth + '月';
-            const yoyData = dashboardData.department_yoy?.[monthName] || {};
+            const yoyValues = dashboardData.department_yoy?.[monthName] || [];
             
-            // department_yoy 是对象 {科室名: 同比数值}
-            const depts = Object.keys(yoyData);
-            const values = Object.values(yoyData);
+            // 从 department_stats 获取科室名称
+            const depts = dashboardData.department_stats?.departments || [];
             
             const option = {
-                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                tooltip: { 
+                    trigger: 'axis', 
+                    axisPointer: { type: 'shadow' },
+                    formatter: function(params) {
+                        const d = params[0];
+                        return d.name + '<br/>同比: ' + (d.value >= 0 ? '+' : '') + d.value + '篇';
+                    }
+                },
                 grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },
                 xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: 10, rotate: 30 } },
                 yAxis: { type: 'value', axisLabel: { color: '#8a9cc2' } },
                 series: [{
                     type: 'bar',
-                    data: values.map(v => ({ 
+                    data: yoyValues.map(v => ({ 
                         value: v, 
                         itemStyle: { color: v >= 0 ? '#22c55e' : '#ef4444' } 
                     })),
                     barWidth: '45%',
-                    label: { show: true, position: 'top', color: '#fff', fontSize: 11, formatter: '{c}%' }
+                    label: { show: true, position: 'top', color: '#fff', fontSize: 11, fontWeight: 'bold', formatter: '{c}' }
                 }]
             };
             chart.setOption(option);
