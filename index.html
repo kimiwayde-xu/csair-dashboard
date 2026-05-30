@@ -25,7 +25,56 @@
             box-shadow: 0 4px 20px rgba(74, 144, 217, 0.2);
         }
         .header h1 { color: #fff; font-size: 36px; letter-spacing: 4px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .header-right { display: flex; align-items: center; gap: 20px; }
         #datetime { color: #7eb8da; font-size: 18px; }
+
+        /* 自动刷新控件样式 */
+        .auto-refresh-controls { display: flex; align-items: center; gap: 10px; }
+        .refresh-status { color: #7eb8da; font-size: 14px; }
+        .refresh-countdown { color: #4a90d9; font-size: 14px; min-width: 60px; text-align: center; }
+        .refresh-btn {
+            background: rgba(74, 144, 217, 0.3);
+            border: 1px solid rgba(74, 144, 217, 0.5);
+            color: #7eb8da;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .refresh-btn:hover { background: rgba(74, 144, 217, 0.5); color: #fff; }
+
+        /* 开关按钮样式 */
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: rgba(20, 28, 40, 0.8);
+            border: 1px solid rgba(74, 144, 217, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .toggle-switch.active {
+            background: rgba(74, 144, 217, 0.4);
+            border-color: #4a90d9;
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background: #8a9cc2;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        .toggle-switch.active::after {
+            left: 26px;
+            background: #4a90d9;
+        }
+
         .controls {
             background: rgba(26, 45, 74, 0.6);
             padding: 18px 30px;
@@ -87,7 +136,7 @@
         }
         .chart-container { height: 300px; }
         .yearly-chart { height: 240px; }
-        
+
         /* 前三名高亮动画 */
         @keyframes glow {
             0%, 100% { filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8)); }
@@ -97,12 +146,106 @@
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
         }
+
+        /* 照片轮播样式 */
+        .photo-slider {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            overflow: hidden;
+            border-radius: 8px;
+            background: rgba(10, 14, 23, 0.5);
+        }
+        .slider-viewport {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .slider-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .slider-slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+        .slider-slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .slider-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+            width: 44px;
+            height: 44px;
+            background: rgba(26, 45, 74, 0.7);
+            border: 1px solid rgba(74, 144, 217, 0.4);
+            border-radius: 50%;
+            color: #7eb8da;
+            font-size: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .slider-arrow:hover {
+            background: rgba(74, 144, 217, 0.5);
+            color: #fff;
+        }
+        .slider-arrow.prev { left: 12px; }
+        .slider-arrow.next { right: 12px; }
+        .slider-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            display: flex;
+            gap: 8px;
+        }
+        .slider-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(126, 184, 218, 0.3);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 0;
+        }
+        .slider-dot.active {
+            background: #4a90d9;
+            transform: scale(1.3);
+        }
+        .slider-dot:hover {
+            background: rgba(126, 184, 218, 0.6);
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>✈️ 2026年地服部宣传数据可视化看板</h1>
-        <div id="datetime"></div>
+        <div class="header-right">
+            <div class="auto-refresh-controls">
+                <span class="refresh-status">自动刷新</span>
+                <div class="toggle-switch active" id="autoRefreshToggle"></div>
+                <span class="refresh-countdown" id="refreshCountdown">30s</span>
+                <button class="refresh-btn" id="manualRefresh">🔄 立即刷新</button>
+            </div>
+            <div id="datetime"></div>
+        </div>
     </div>
 
     <div class="controls">
@@ -169,17 +312,89 @@
             <div class="card-title">🏆 全年科室稿件排名</div>
             <div class="chart-container yearly-chart" id="yearlyDeptChart"></div>
         </div>
+
+        <div class="card" style="grid-column: span 4;">
+            <div class="card-title">📸 宣传照片</div>
+            <div class="photo-slider" id="photoSlider">
+                <div class="slider-viewport" id="sliderViewport">
+                    <div class="slider-slide active">
+                        <img src="" alt="加载中..." id="loadingImg">
+                    </div>
+                </div>
+                <button class="slider-arrow prev" id="sliderPrev">&#8249;</button>
+                <button class="slider-arrow next" id="sliderNext">&#8250;</button>
+                <div class="slider-dots" id="sliderDots"></div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // ========== 数据定义 ==========
-        const dashboardData = {"platform_distribution": {"platforms": ["内部媒体", "行业媒体", "主流媒体", "公众号", "视频号"], "values": [36, 4, 38, 17, 0], "percentages": [37.9, 4.2, 40.0, 17.9]}, "department_stats": {"departments": ["虹桥值机", "虹桥高端服务室", "虹桥服务室", "浦东值机室", "浦东高端服务室", "浦东服务室", "客机保障室", "货机保障室", "勤务保障室", "运行管理室", "经营管理室", "安全管理室"], "values": [62, 50, 38, 53, 47, 40, 32, 13, 9, 18, 37, 3]}, "monthly_data": {"2025": {"1月": {"total": 28, "departments": [7, 9, 10, 10, 11, 8, 6, 4, 3, 4, 4, 0]}, "2月": {"total": 20, "departments": [3, 14, 3, 12, 18, 4, 4, 2, 1, 10, 2, 1]}, "3月": {"total": 28, "departments": [2, 1, 9, 14, 12, 5, 4, 7, 3, 1, 3, 0]}, "4月": {"total": 20, "departments": [5, 3, 3, 5, 9, 5, 6, 1, 2, 2, 5, 1]}, "5月": {"total": 23, "departments": [9, 7, 5, 6, 7, 5, 5, 0, 3, 8, 5, 1]}, "6月": {"total": 22, "departments": [4, 4, 6, 13, 12, 8, 3, 1, 0, 8, 9, 1]}, "7月": {"total": 9, "departments": [3, 0, 4, 2, 3, 3, 1, 1, 1, 0, 4, 0]}, "8月": {"total": 53, "departments": [45, 42, 45, 3, 3, 3, 44, 4, 4, 0, 46, 1]}, "9月": {"total": 22, "departments": [9, 11, 8, 4, 4, 4, 2, 1, 1, 3, 12, 2]}, "10月": {"total": 20, "departments": [11, 8, 2, 12, 9, 7, 3, 2, 2, 0, 3, 1]}, "11月": {"total": 28, "departments": [15, 12, 3, 19, 17, 8, 1, 2, 0, 1, 2, 1]}, "12月": {"total": 29, "departments": [5, 5, 0, 4, 5, 4, 6, 3, 3, 2, 11, 1]}}, "2026": {"1月": {"total": 15, "departments": [7, 4, 3, 6, 1, 2, 8, 7, 2, 1, 0, 0], "platform": {"内部媒体": 8, "公众号": 1, "行业媒体": 1, "主流媒体": 2}}, "2月": {"total": 28, "departments": [22, 19, 13, 19, 17, 13, 12, 1, 1, 7, 14, 0], "platform": {"主流媒体": 16, "内部媒体": 8, "公众号": 3, "行业媒体": 1}}, "3月": {"total": 24, "departments": [15, 15, 8, 14, 14, 9, 5, 2, 1, 9, 8, 0], "platform": {"内部媒体": 7, "主流媒体": 10, "公众号": 6, "行业媒体": 1}}, "4月": {"total": 19, "departments": [13, 10, 10, 9, 11, 9, 3, 2, 3, 0, 8, 2], "platform": {"内部媒体": 9, "公众号": 3, "主流媒体": 6, "行业媒体": 1}}, "5月": {"total": 12, "departments": [5, 2, 4, 5, 4, 7, 4, 1, 2, 1, 7, 1], "platform": {"主流媒体": 3, "内部媒体": 4, "公众号": 4}}, "6月": {"total": 0, "departments": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "platform": {}}, "7月": {"total": 0, "departments": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "platform": {}}, "8月": {"total": 0, "departments": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "platform": {}}, "9月": {"total": 0, "departments": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "platform": {}}, "10月": {"total": 0, "departments": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "platform": {}}, "11月": {"total": 0, "departments": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "platform": {}}, "12月": {"total": 0, "departments": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "platform": {}}}}, "year_over_year": {"1月": {"total": -13, "departments": [0, -5, -7, -4, -10, -6, 2, 3, -1, -3, -4, 0]}, "2月": {"total": 8, "departments": [19, 5, 10, 7, -1, 9, 8, -1, 0, -3, 12, -1]}, "3月": {"total": -4, "departments": [13, 14, -1, 0, 2, 4, 1, -5, -2, 8, 5, 0]}, "4月": {"total": -1, "departments": [8, 7, 7, 4, 2, 4, -3, 1, 1, -2, 3, 1]}, "5月": {"total": -11, "departments": [-4, -5, -1, -1, -3, 2, -1, 1, -1, -7, 2, 0]}, "6月": {"total": -22, "departments": [-4, -4, -6, -13, -12, -8, -3, -1, 0, -8, -9, -1]}, "7月": {"total": -9, "departments": [-3, 0, -4, -2, -3, -3, -1, -1, -1, 0, -4, 0]}, "8月": {"total": -53, "departments": [-45, -42, -45, -3, -3, -3, -44, -4, -4, 0, -46, -1]}, "9月": {"total": -22, "departments": [-9, -11, -8, -4, -4, -4, -2, -1, -1, -3, -12, -2]}, "10月": {"total": -20, "departments": [-11, -8, -2, -12, -9, -7, -3, -2, -2, 0, -3, -1]}, "11月": {"total": -28, "departments": [-15, -12, -3, -19, -17, -8, -1, -2, 0, -1, -2, -1]}, "12月": {"total": -29, "departments": [-5, -5, 0, -4, -5, -4, -6, -3, -3, -2, -11, -1]}}, "quarter_yoy": {"一季度": {"2025": 76, "2026": 67, "yoy": -9}, "二季度": {"2025": 65, "2026": 31, "yoy": -34}, "三季度": {"2025": 84, "2026": 0, "yoy": -84}, "四季度": {"2025": 77, "2026": 0, "yoy": -77}}, "summary": {"total_articles": 95, "monthly_avg": 7.92, "current_month_articles": 12, "current_year": 2026, "current_month": 5}, "current_month_platform": {"主流媒体": 3, "内部媒体": 4, "公众号": 4}, "department_yoy": {"1月": [0, -5, -7, -4, -10, -6, 2, 3, -1, -3, -4, 0], "2月": [19, 5, 10, 7, -1, 9, 8, -1, 0, -3, 12, -1], "3月": [13, 14, -1, 0, 2, 4, 1, -5, -2, 8, 5, 0], "4月": [8, 7, 7, 4, 2, 4, -3, 1, 1, -2, 3, 1], "5月": [-4, -5, -1, -1, -3, 2, -1, 1, -1, -7, 2, 0], "6月": [-4, -4, -6, -13, -12, -8, -3, -1, 0, -8, -9, -1], "7月": [-3, 0, -4, -2, -3, -3, -1, -1, -1, 0, -4, 0], "8月": [-45, -42, -45, -3, -3, -3, -44, -4, -4, 0, -46, -1], "9月": [-9, -11, -8, -4, -4, -4, -2, -1, -1, -3, -12, -2], "10月": [-11, -8, -2, -12, -9, -7, -3, -2, -2, 0, -3, -1], "11月": [-15, -12, -3, -19, -17, -8, -1, -2, 0, -1, -2, -1], "12月": [-5, -5, 0, -4, -5, -4, -6, -3, -3, -2, -11, -1]}, "monthly_yoy_totals": {"1月": -13, "2月": 8, "3月": -4, "4月": -1, "5月": -11, "6月": -22, "7月": -9, "8月": -53, "9月": -22, "10月": -20, "11月": -28, "12月": -29}, "monthly_platform": {"1": {"内部媒体": 8, "公众号": 1, "行业媒体": 1, "主流媒体": 2}, "2": {"主流媒体": 16, "内部媒体": 8, "公众号": 3, "行业媒体": 1}, "3": {"内部媒体": 7, "主流媒体": 10, "公众号": 6, "行业媒体": 1}, "4": {"内部媒体": 9, "公众号": 3, "主流媒体": 6, "行业媒体": 1}, "5": {"主流媒体": 3, "内部媒体": 4, "公众号": 4}, "6": {}, "7": {}, "8": {}, "9": {}, "10": {}, "11": {}, "12": {}}};
-
+        // ========== 全局变量 ==========
+        let dashboardData = null;
         let currentYear = 2026;
         let currentMonth = 5;
 
+        // ========== 自动刷新控制 ==========
+        let autoRefreshEnabled = true;
+        let refreshInterval = 30; // 秒
+        let countdown = refreshInterval;
+        let refreshTimer = null;
+
+        function toggleAutoRefresh() {
+            autoRefreshEnabled = !autoRefreshEnabled;
+            const toggleEl = document.getElementById('autoRefreshToggle');
+            const countdownEl = document.getElementById('refreshCountdown');
+
+            if (autoRefreshEnabled) {
+                toggleEl.classList.add('active');
+                countdownEl.textContent = countdown + 's';
+                startCountdown();
+            } else {
+                toggleEl.classList.remove('active');
+                countdownEl.textContent = 'OFF';
+                stopCountdown();
+            }
+        }
+
+        function startCountdown() {
+            stopCountdown();
+            countdown = refreshInterval;
+            const countdownEl = document.getElementById('refreshCountdown');
+            countdownEl.textContent = countdown + 's';
+
+            refreshTimer = setInterval(() => {
+                countdown--;
+                if (countdown <= 0) {
+                    countdown = refreshInterval;
+                    location.reload();
+                } else {
+                    const ce = document.getElementById('refreshCountdown');
+                    if (ce) ce.textContent = countdown + 's';
+                }
+            }, 1000);
+        }
+
+        function stopCountdown() {
+            if (refreshTimer) {
+                clearInterval(refreshTimer);
+                refreshTimer = null;
+            }
+        }
+
+        // ========== 动态加载数据 ==========
+        async function loadData() {
+            try {
+                const response = await fetch('data.json?t=' + Date.now(), { cache: 'no-store' });
+                dashboardData = await response.json();
+            } catch (err) {
+                console.error('加载数据失败:', err);
+                alert('加载数据失败，请刷新页面重试。');
+            }
+        }
+
         // ========== 初始化所有图表 ==========
         function initCharts() {
+            if (!dashboardData) { console.error('数据未加载'); return; }
             try { initPlatformChart(); } catch(e) { console.error('平台分布图错误:', e); }
             try { initMonthlyDeptChart(); } catch(e) { console.error('月度科室排名错误:', e); }
             try { initYearlyDeptChart(); } catch(e) { console.error('全年科室排名错误:', e); }
@@ -215,17 +430,17 @@
             const monthName = currentMonth + '月';
             const monthData = dashboardData.monthly_data[currentYear]?.[monthName];
             if (!monthData) return;
-            
+
             const depts = dashboardData.department_stats.departments;
             const values = monthData.departments;
-            
+
             // 找出前三名的索引
             const sorted = values.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v);
             const top3 = new Set(sorted.slice(0, 3).map(x => x.i));
-            
+
             // 前三名颜色：金、银、铜
             const topColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
-            
+
             const option = {
                 tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
                 grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
@@ -271,12 +486,12 @@
             const deptData = dashboardData.department_stats;
             const depts = deptData.departments;
             const values = deptData.values;
-            
+
             // 找出前三名
             const sorted = values.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v);
             const top3 = new Set(sorted.slice(0, 3).map(x => x.i));
             const topColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
-            
+
             const option = {
                 tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
                 grid: { left: '3%', right: '4%', bottom: '12%', top: '8%', containLabel: true },
@@ -308,11 +523,11 @@
                         };
                     }),
                     barWidth: '50%',
-                    label: { 
-                        show: true, 
-                        position: 'top', 
-                        color: '#fff', 
-                        fontSize: 14, 
+                    label: {
+                        show: true,
+                        position: 'top',
+                        color: '#fff',
+                        fontSize: 14,
                         fontWeight: 'bold',
                         formatter: function(params) {
                             const rank = sorted.findIndex(x => x.i === params.dataIndex);
@@ -329,11 +544,11 @@
             };
             chart.setOption(option);
             window.addEventListener('resize', () => chart.resize());
-            
+
             // 动态闪烁效果（页面可见时运行）
             let highlight = true;
             let blinkInterval = setInterval(() => {
-                if (document.hidden) return;  // 页面不可见时跳过
+                if (document.hidden) return;
                 chart.setOption({
                     series: [{
                         data: values.map((v, i) => {
@@ -371,7 +586,7 @@
             const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
             const data2025 = months.map(m => dashboardData.monthly_data['2025']?.[m]?.total || 0);
             const data2026 = months.map(m => dashboardData.monthly_data['2026']?.[m]?.total || 0);
-            
+
             const option = {
                 tooltip: { trigger: 'axis', textStyle: { fontSize: 14 } },
                 legend: { data: ['2025年', '2026年'], textStyle: { color: '#8a9cc2', fontSize: 14 } },
@@ -379,31 +594,31 @@
                 xAxis: { type: 'category', data: months, axisLabel: { color: '#c8d4e8', fontSize: 12 } },
                 yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: 12 } },
                 series: [
-                    { 
-                        name: '2025年', 
-                        type: 'line', 
-                        data: data2025, 
-                        smooth: true, 
-                        lineStyle: { color: '#64748b', width: 3 }, 
+                    {
+                        name: '2025年',
+                        type: 'line',
+                        data: data2025,
+                        smooth: true,
+                        lineStyle: { color: '#64748b', width: 3 },
                         itemStyle: { color: '#64748b' },
                         symbol: 'circle',
                         symbolSize: 8
                     },
-                    { 
-                        name: '2026年', 
-                        type: 'line', 
-                        data: data2026, 
-                        smooth: true, 
-                        lineStyle: { color: '#4a90d9', width: 3 }, 
+                    {
+                        name: '2026年',
+                        type: 'line',
+                        data: data2026,
+                        smooth: true,
+                        lineStyle: { color: '#4a90d9', width: 3 },
                         itemStyle: { color: '#4a90d9' },
                         symbol: 'circle',
                         symbolSize: 8,
-                        areaStyle: { 
+                        areaStyle: {
                             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                                { offset: 0, color: 'rgba(74,144,217,0.3)' }, 
+                                { offset: 0, color: 'rgba(74,144,217,0.3)' },
                                 { offset: 1, color: 'rgba(74,144,217,0)' }
-                            ]) 
-                        } 
+                            ])
+                        }
                     }
                 ]
             };
@@ -417,15 +632,15 @@
             const monthName = currentMonth + '月';
             const yoyValues = dashboardData.department_yoy?.[monthName] || [];
             const depts = dashboardData.department_stats?.departments || [];
-            
+
             // 找出增长前三和下降前三
             const sorted = yoyValues.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v);
             const topGrowth = new Set(sorted.filter(x => x.v > 0).slice(0, 3).map(x => x.i));
             const topDrop = new Set(sorted.filter(x => x.v < 0).slice(-3).map(x => x.i));
-            
+
             const option = {
-                tooltip: { 
-                    trigger: 'axis', 
+                tooltip: {
+                    trigger: 'axis',
                     axisPointer: { type: 'shadow' },
                     textStyle: { fontSize: 14 },
                     formatter: function(params) {
@@ -446,9 +661,9 @@
                         } else if (topDrop.has(i)) {
                             shadowBlur = 15;
                         }
-                        return { 
-                            value: v, 
-                            itemStyle: { color, borderRadius: [6, 6, 0, 0], shadowBlur, shadowColor: color } 
+                        return {
+                            value: v,
+                            itemStyle: { color, borderRadius: [6, 6, 0, 0], shadowBlur, shadowColor: color }
                         };
                     }),
                     barWidth: '50%',
@@ -462,15 +677,105 @@
             window.addEventListener('resize', () => chart.resize());
         }
 
+        // ========== 6. 照片轮播 ==========
+        let sliderIndex = 0;
+        let sliderTotal = 0;
+        let sliderTimer = null;
+        const SLIDER_INTERVAL = 5000;
+
+        function initPhotoSlider() {
+            const viewport = document.getElementById('sliderViewport');
+            const dotsContainer = document.getElementById('sliderDots');
+            const sliderEl = document.getElementById('photoSlider');
+
+            fetch('photos.json?t=' + Date.now(), { cache: 'no-store' })
+                .then(r => r.json())
+                .then(data => {
+                    const photos = data.photos || [];
+                    if (photos.length === 0) {
+                        viewport.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#8a9cc2;">暂无照片</div>';
+                        return;
+                    }
+
+                    sliderTotal = photos.length;
+
+                    // 创建幻灯片
+                    viewport.innerHTML = photos.map((p, i) =>
+                        `<div class="slider-slide ${i === 0 ? 'active' : ''}"><img src="${p.path}" alt="${p.title}"></div>`
+                    ).join('');
+
+                    // 创建指示点
+                    dotsContainer.innerHTML = photos.map((_, i) =>
+                        `<button class="slider-dot ${i === 0 ? 'active' : ''}" data-index="${i}"></button>`
+                    ).join('');
+
+                    // 绑定指示点点击事件
+                    dotsContainer.addEventListener('click', (e) => {
+                        const dot = e.target.closest('.slider-dot');
+                        if (!dot) return;
+                        goToSlide(parseInt(dot.dataset.index));
+                    });
+
+                    // 绑定箭头事件
+                    document.getElementById('sliderPrev').addEventListener('click', () => {
+                        goToSlide((sliderIndex - 1 + sliderTotal) % sliderTotal);
+                    });
+                    document.getElementById('sliderNext').addEventListener('click', () => {
+                        goToSlide((sliderIndex + 1) % sliderTotal);
+                    });
+
+                    // 鼠标悬停暂停，离开恢复
+                    sliderEl.addEventListener('mouseenter', () => stopAutoPlay());
+                    sliderEl.addEventListener('mouseleave', () => startAutoPlay());
+
+                    startAutoPlay();
+                })
+                .catch(err => {
+                    console.error('加载照片失败:', err);
+                    viewport.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#ef4444;">加载照片失败</div>';
+                });
+        }
+
+        function goToSlide(index) {
+            if (index < 0 || index >= sliderTotal) return;
+            const slides = document.querySelectorAll('.slider-slide');
+            const dots = document.querySelectorAll('.slider-dot');
+            slides[sliderIndex].classList.remove('active');
+            dots[sliderIndex].classList.remove('active');
+            sliderIndex = index;
+            slides[sliderIndex].classList.add('active');
+            dots[sliderIndex].classList.add('active');
+            resetAutoPlay();
+        }
+
+        function startAutoPlay() {
+            stopAutoPlay();
+            sliderTimer = setInterval(() => {
+                goToSlide((sliderIndex + 1) % sliderTotal);
+            }, SLIDER_INTERVAL);
+        }
+
+        function stopAutoPlay() {
+            if (sliderTimer) {
+                clearInterval(sliderTimer);
+                sliderTimer = null;
+            }
+        }
+
+        function resetAutoPlay() {
+            stopAutoPlay();
+            startAutoPlay();
+        }
+
         // ========== 更新指标卡片 ==========
         function updateMetrics() {
             document.getElementById('totalArticles').textContent = dashboardData.summary.total_articles;
             document.getElementById('monthlyAvg').textContent = dashboardData.summary.monthly_avg.toFixed(2);
-            
+
             const monthName = currentMonth + '月';
             const monthData = dashboardData.monthly_data[currentYear]?.[monthName];
             document.getElementById('currentMonthArticles').textContent = monthData ? monthData.total : '-';
-            
+
             const yoy = dashboardData.monthly_yoy_totals?.[monthName] || dashboardData.year_over_year[monthName]?.total || 0;
             const yoyElem = document.getElementById('yearOverYear');
             yoyElem.textContent = (yoy >= 0 ? '+' : '') + yoy;
@@ -481,21 +786,32 @@
         function updateDashboard() {
             currentYear = parseInt(document.getElementById('yearSelect').value);
             currentMonth = parseInt(document.getElementById('monthSelect').value);
-            
+
             document.getElementById('monthlyDeptTitle').textContent = '🏆 ' + currentMonth + '月科室稿件排名';
             document.getElementById('deptYoyTitle').textContent = '📈 ' + currentMonth + '月科室同比';
-            
+
             updateMetrics();
             initMonthlyDeptChart();
             initDeptYoyChart();
         }
 
         // ========== 页面加载完成后初始化 ==========
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadData();
             initCharts();
+            initPhotoSlider();
+
+            // 更新时间
             setInterval(() => {
                 document.getElementById('datetime').textContent = new Date().toLocaleString('zh-CN');
             }, 1000);
+
+            // 绑定自动刷新控件事件
+            document.getElementById('autoRefreshToggle').addEventListener('click', toggleAutoRefresh);
+            document.getElementById('manualRefresh').addEventListener('click', () => location.reload());
+
+            // 启动自动刷新倒计时
+            startCountdown();
         });
     </script>
 </body>
