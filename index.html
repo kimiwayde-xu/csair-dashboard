@@ -116,11 +116,7 @@
         <div class="control-group">
             <span class="control-label">月份:</span>
             <select id="monthSelect" onchange="updateDashboard()">
-                <option value="1">1月</option>
-                <option value="2">2月</option>
-                <option value="3">3月</option>
-                <option value="4">4月</option>
-                <option value="5" selected>5月</option>
+                <!-- 月份选项由 JavaScript 动态生成 -->
             </select>
         </div>
     </div>
@@ -490,8 +486,34 @@
             initDeptYoyChart();
         }
 
+        // ========== 动态生成月份选项 ==========
+        function generateMonthOptions() {
+            const monthSelect = document.getElementById('monthSelect');
+            const months = Object.keys(dashboardData.monthly_data['2026']).sort((a, b) => parseInt(a) - parseInt(b));
+            
+            // 找到最后一个有数据的月份
+            let lastMonthWithData = 1;
+            months.forEach(m => {
+                if (dashboardData.monthly_data['2026'][m]?.total > 0) {
+                    lastMonthWithData = parseInt(m);
+                }
+            });
+            
+            months.forEach(m => {
+                const option = document.createElement('option');
+                option.value = parseInt(m);
+                option.textContent = m;
+                if (parseInt(m) === lastMonthWithData) {
+                    option.selected = true;
+                    currentMonth = lastMonthWithData;
+                }
+                monthSelect.appendChild(option);
+            });
+        }
+
         // ========== 页面加载完成后初始化 ==========
         window.addEventListener('DOMContentLoaded', () => {
+            generateMonthOptions();
             initCharts();
             setInterval(() => {
                 document.getElementById('datetime').textContent = new Date().toLocaleString('zh-CN');
