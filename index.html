@@ -189,6 +189,140 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
+
+        /* ========== 响应式布局 ========== */
+        
+        /* 大屏幕（>1400px）：保持4列布局 */
+        @media (min-width: 1401px) {
+            .dashboard { grid-template-columns: repeat(4, 1fr); }
+            .metric-cards { grid-template-columns: repeat(4, 1fr); }
+        }
+        
+        /* 中大屏幕（1200px - 1400px）：3列布局 */
+        @media (max-width: 1400px) {
+            .dashboard { grid-template-columns: repeat(3, 1fr); }
+            .metric-cards { grid-template-columns: repeat(4, 1fr); }
+            .card[style*="grid-column: span 4"] { grid-column: span 3 !important; }
+            .card[style*="grid-column: span 2"] { grid-column: span 2 !important; }
+        }
+        
+        /* 中等屏幕（992px - 1199px）：2列布局 */
+        @media (max-width: 1199px) {
+            .dashboard { grid-template-columns: repeat(2, 1fr); }
+            .metric-cards { grid-template-columns: repeat(2, 1fr); }
+            .card[style*="grid-column: span 4"] { grid-column: span 2 !important; }
+            .card[style*="grid-column: span 2"] { grid-column: span 2 !important; }
+            .header h1 { font-size: 28px; letter-spacing: 2px; }
+            .metric-value { font-size: 36px; }
+        }
+        
+        /* 平板（768px - 991px）：2列布局，调整间距 */
+        @media (max-width: 991px) {
+            body { padding: 15px; }
+            .header { padding: 20px 25px; }
+            .header h1 { font-size: 24px; }
+            .controls { flex-wrap: wrap; gap: 15px; }
+            .control-group { flex: 0 0 auto; }
+            .metric-cards { gap: 12px; }
+            .metric-card { padding: 20px; }
+            .metric-value { font-size: 32px; }
+            .dashboard { gap: 15px; }
+            .card { padding: 20px; }
+            .card-title { font-size: 18px; margin-bottom: 15px; }
+            .chart-container { height: 260px; }
+            .yearly-chart { height: 220px; }
+            .photo-carousel { height: 250px; }
+        }
+        
+        /* 手机横屏（576px - 767px）：单列布局 */
+        @media (max-width: 767px) {
+            body { padding: 10px; }
+            .header { 
+                padding: 15px 20px; 
+                flex-direction: column; 
+                gap: 10px; 
+                text-align: center; 
+            }
+            .header h1 { font-size: 20px; }
+            #datetime { font-size: 14px; }
+            .controls { 
+                flex-direction: column; 
+                align-items: stretch; 
+                gap: 12px; 
+            }
+            .control-group { 
+                justify-content: space-between; 
+            }
+            .metric-cards { 
+                grid-template-columns: repeat(2, 1fr); 
+                gap: 10px; 
+            }
+            .metric-card { padding: 15px; }
+            .metric-label { font-size: 14px; }
+            .metric-value { font-size: 28px; }
+            .dashboard { 
+                grid-template-columns: 1fr; 
+                gap: 12px; 
+            }
+            .card[style*="grid-column"] { 
+                grid-column: span 1 !important; 
+            }
+            .card { padding: 18px; }
+            .card-title { font-size: 16px; margin-bottom: 12px; }
+            .chart-container { height: 250px; }
+            .yearly-chart { height: 200px; }
+            .photo-carousel { height: 220px; }
+            .carousel-btn { 
+                width: 36px; 
+                height: 36px; 
+                font-size: 18px; 
+            }
+        }
+        
+        /* 手机竖屏（<576px）：完全单列，优化触摸操作 */
+        @media (max-width: 575px) {
+            body { padding: 8px; }
+            .header { padding: 12px 15px; }
+            .header h1 { 
+                font-size: 16px; 
+                letter-spacing: 1px; 
+            }
+            #datetime { font-size: 12px; }
+            .controls { padding: 12px 15px; }
+            .control-label { font-size: 14px; }
+            select { 
+                padding: 8px 12px; 
+                font-size: 14px; 
+            }
+            .refresh-btn { 
+                padding: 8px 14px; 
+                font-size: 13px; 
+            }
+            .metric-cards { gap: 8px; }
+            .metric-card { padding: 12px; }
+            .metric-label { font-size: 13px; margin-bottom: 8px; }
+            .metric-value { font-size: 24px; }
+            .card { padding: 15px; }
+            .card-title { 
+                font-size: 15px; 
+                margin-bottom: 10px; 
+            }
+            .chart-container { height: 220px; }
+            .yearly-chart { height: 180px; }
+            .photo-carousel { height: 200px; }
+            .carousel-btn { 
+                width: 32px; 
+                height: 32px; 
+                font-size: 16px; 
+            }
+            .carousel-prev { left: 8px; }
+            .carousel-next { right: 8px; }
+            .carousel-dots { gap: 6px; }
+            .carousel-dot { 
+                width: 8px; 
+                height: 8px; 
+            }
+        }
     </style>
 </head>
 <body>
@@ -279,6 +413,25 @@
         let currentYear = 2026;
         let currentMonth = 5;
 
+        // ========== 响应式工具函数 ==========
+        function getResponsiveConfig() {
+            const width = window.innerWidth;
+            const isMobile = width < 768;
+            const isSmallMobile = width < 576;
+            
+            return {
+                fontSize: isSmallMobile ? 11 : isMobile ? 12 : 14,
+                axisLabelFontSize: isSmallMobile ? 10 : isMobile ? 11 : 12,
+                titleFontSize: isSmallMobile ? 12 : isMobile ? 14 : 16,
+                legendFontSize: isSmallMobile ? 10 : isMobile ? 11 : 13,
+                gridLeft: isMobile ? '3%' : '5%',
+                gridRight: isMobile ? '3%' : '5%',
+                gridBottom: isMobile ? '10%' : '15%',
+                isMobile: isMobile,
+                isSmallMobile: isSmallMobile
+            };
+        }
+
         // ========== 初始化所有图表 ==========
         function initCharts() {
             try { initPlatformChart(); } catch(e) { console.error('平台分布图错误:', e); }
@@ -293,21 +446,34 @@
         function initPlatformChart() {
             const chart = echarts.init(document.getElementById('platformChart'));
             const d = dashboardData.platform_distribution;
+            const config = getResponsiveConfig();
             const option = {
                 tooltip: { trigger: 'item', formatter: '{b}: {c}篇 ({d}%)' },
-                legend: { bottom: 0, textStyle: { color: '#8a9cc2', fontSize: 14 } },
+                legend: { 
+                    bottom: 0, 
+                    textStyle: { color: '#8a9cc2', fontSize: config.legendFontSize },
+                    itemWidth: config.isMobile ? 15 : 25,
+                    itemHeight: config.isMobile ? 10 : 14
+                },
                 series: [{
                     type: 'pie',
-                    radius: ['40%', '65%'],
+                    radius: config.isMobile ? ['35%', '60%'] : ['40%', '65%'],
                     center: ['50%', '45%'],
                     data: d.platforms.map((p, i) => ({ value: d.values[i], name: p })),
                     emphasis: { itemStyle: { shadowBlur: 20, shadowColor: 'rgba(74,144,217,0.5)' } },
-                    label: { color: '#c8d4e8', fontSize: 14, formatter: '{b}\n{c}篇 ({d}%)' },
+                    label: { 
+                        color: '#c8d4e8', 
+                        fontSize: config.fontSize,
+                        formatter: config.isMobile ? '{b}' : '{b}\n{c}篇 ({d}%)'
+                    },
                     itemStyle: { borderRadius: 6, borderColor: '#0a0e17', borderWidth: 2 }
                 }]
             };
             chart.setOption(option);
-            window.addEventListener('resize', () => chart.resize());
+            window.addEventListener('resize', () => {
+                chart.setOption(getResponsiveConfig());
+                chart.resize();
+            });
         }
 
         // ========== 2. 月度科室排名（前三名高亮）==========
