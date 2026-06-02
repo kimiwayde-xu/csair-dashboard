@@ -148,6 +148,47 @@
             transition: all 0.3s;
         }
         .carousel-dot.active { background: #4a90d9; transform: scale(1.3); }
+
+        /* 刷新按钮 */
+        .refresh-btn {
+            background: linear-gradient(135deg, #4a90d9 0%, #3a7bc8 100%);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .refresh-btn:hover {
+            background: linear-gradient(135deg, #5a9de9 0%, #4a8dd8 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(74, 144, 217, 0.3);
+        }
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
+        .refresh-btn.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .refresh-icon {
+            display: inline-block;
+            transition: transform 0.3s;
+        }
+        .refresh-btn:hover .refresh-icon {
+            transform: rotate(90deg);
+        }
+        .refresh-btn.loading .refresh-icon {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -174,6 +215,10 @@
                 <option value="5" selected>5月</option>
             </select>
         </div>
+        <button class="refresh-btn" onclick="refreshData()">
+            <span class="refresh-icon">🔄</span>
+            <span>刷新数据</span>
+        </button>
     </div>
 
     <div class="metric-cards">
@@ -638,6 +683,18 @@
                 carousel.addEventListener('mouseleave', startPhotoTimer);
             }
         });
+
+        // ========== 手动刷新功能 ==========
+        function refreshData() {
+            const btn = document.querySelector('.refresh-btn');
+            btn.classList.add('loading');
+            btn.querySelector('span:last-child').textContent = '刷新中...';
+            
+            // 刷新页面（强制重新加载）
+            setTimeout(() => {
+                location.reload();
+            }, 300);
+        }
     </script>
 </body>
 </html>
