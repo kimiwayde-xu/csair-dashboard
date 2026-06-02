@@ -200,7 +200,7 @@
     <div class="controls">
         <div class="control-group">
             <span class="control-label">年份:</span>
-            <select id="yearSelect" onchange="updateDashboard()">
+            <select id="yearSelect" onchange="generateMonthOptions(); updateDashboard();">
                 <option value="2026" selected>2026年</option>
                 <option value="2025">2025年</option>
             </select>
@@ -208,11 +208,7 @@
         <div class="control-group">
             <span class="control-label">月份:</span>
             <select id="monthSelect" onchange="updateDashboard()">
-                <option value="1">1月</option>
-                <option value="2">2月</option>
-                <option value="3">3月</option>
-                <option value="4">4月</option>
-                <option value="5" selected>5月</option>
+                <!-- 月份选项由 JavaScript 动态生成 -->
             </select>
         </div>
         <button class="refresh-btn" onclick="refreshData()">
@@ -597,6 +593,7 @@
 
         // ========== 页面加载完成后初始化 ==========
         window.addEventListener('DOMContentLoaded', () => {
+            generateMonthOptions(); // 动态生成月份选项
             initCharts();
             loadPhotos();
             setInterval(() => {
@@ -683,6 +680,44 @@
                 carousel.addEventListener('mouseleave', startPhotoTimer);
             }
         });
+
+        // ========== 动态生成月份选项 ==========
+        function generateMonthOptions() {
+            const monthSelect = document.getElementById('monthSelect');
+            const yearSelect = document.getElementById('yearSelect');
+            const selectedYear = yearSelect.value;
+            
+            // 清空现有选项
+            monthSelect.innerHTML = '';
+            
+            // 从数据中获取该年所有月份
+            const yearData = dashboardData.monthly_data[selectedYear];
+            if (!yearData) return;
+            
+            const months = Object.keys(yearData).sort((a, b) => parseInt(a) - parseInt(b));
+            
+            // 找到最后一个有数据的月份
+            let lastMonthWithData = 1;
+            months.forEach(m => {
+                const monthNum = parseInt(m);
+                const total = yearData[m]?.total || 0;
+                if (total > 0) lastMonthWithData = monthNum;
+            });
+            
+            // 生成选项
+            months.forEach(m => {
+                const monthNum = parseInt(m);
+                const option = document.createElement('option');
+                option.value = monthNum;
+                option.textContent = monthNum + '月';
+                // 默认选中最后一个有数据的月份
+                if (monthNum === lastMonthWithData) option.selected = true;
+                monthSelect.appendChild(option);
+            });
+            
+            // 更新当前月份
+            currentMonth = lastMonthWithData;
+        }
 
         // ========== 手动刷新功能 ==========
         function refreshData() {
