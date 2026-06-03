@@ -759,8 +759,9 @@
 
         // ========== 页面加载完成后初始化 ==========
         window.addEventListener('DOMContentLoaded', () => {
-            generateMonthOptions(); // 动态生成月份选项
+            generateMonthOptions(); // 动态生成月份选项（会更新currentMonth）
             initCharts();
+            updateDashboard(); // 确保标题与当前月份一致
             loadPhotos();
             setInterval(() => {
                 document.getElementById('datetime').textContent = new Date().toLocaleString('zh-CN');
