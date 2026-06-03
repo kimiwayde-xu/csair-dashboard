@@ -485,6 +485,7 @@
             
             const depts = dashboardData.department_stats.departments;
             const values = monthData.departments;
+            const config = getResponsiveConfig();
             
             // 找出前三名的索引
             const sorted = values.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v);
@@ -495,9 +496,9 @@
             
             const option = {
                 tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-                grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: 12, rotate: 20 } },
-                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: 12 } },
+                grid: { left: config.gridLeft, right: config.gridRight, bottom: config.gridBottom, containLabel: true },
+                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: config.axisLabelFontSize, rotate: config.isMobile ? 45 : 20, interval: 0 } },
+                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: config.axisLabelFontSize } },
                 series: [{
                     type: 'bar',
                     data: values.map((v, i) => {
@@ -522,14 +523,23 @@
                         };
                     }),
                     barWidth: '50%',
-                    label: { show: true, position: 'top', color: '#fff', fontSize: 14, fontWeight: 'bold' },
+                    label: { show: true, position: 'top', color: '#fff', fontSize: config.fontSize, fontWeight: 'bold' },
                     animationDelay: (idx) => idx * 50,
                     animationEasing: 'elasticOut'
                 }],
                 animationDuration: 1500
             };
             chart.setOption(option);
-            window.addEventListener('resize', () => chart.resize());
+            window.addEventListener('resize', () => {
+                const newConfig = getResponsiveConfig();
+                chart.setOption({
+                    grid: { left: newConfig.gridLeft, right: newConfig.gridRight, bottom: newConfig.gridBottom, containLabel: true },
+                    xAxis: { axisLabel: { fontSize: newConfig.axisLabelFontSize, rotate: newConfig.isMobile ? 45 : 20 } },
+                    yAxis: { axisLabel: { fontSize: newConfig.axisLabelFontSize } },
+                    series: [{ label: { fontSize: newConfig.fontSize } }]
+                });
+                chart.resize();
+            });
         }
 
         // ========== 3. 全年科室排名（动画+前三高亮）==========
@@ -538,6 +548,7 @@
             const deptData = dashboardData.department_stats;
             const depts = deptData.departments;
             const values = deptData.values;
+            const config = getResponsiveConfig();
             
             // 找出前三名
             const sorted = values.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v);
@@ -546,9 +557,9 @@
             
             const option = {
                 tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-                grid: { left: '3%', right: '4%', bottom: '12%', top: '8%', containLabel: true },
-                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: 12, rotate: 20 } },
-                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: 12 } },
+                grid: { left: config.gridLeft, right: config.gridRight, bottom: config.gridBottom, top: '8%', containLabel: true },
+                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: config.axisLabelFontSize, rotate: config.isMobile ? 45 : 20, interval: 0 } },
+                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: config.axisLabelFontSize } },
                 series: [{
                     type: 'bar',
                     data: values.map((v, i) => {
@@ -579,7 +590,7 @@
                         show: true, 
                         position: 'top', 
                         color: '#fff', 
-                        fontSize: 14, 
+                        fontSize: config.fontSize, 
                         fontWeight: 'bold',
                         formatter: function(params) {
                             const rank = sorted.findIndex(x => x.i === params.dataIndex);
@@ -595,7 +606,16 @@
                 }]
             };
             chart.setOption(option);
-            window.addEventListener('resize', () => chart.resize());
+            window.addEventListener('resize', () => {
+                const newConfig = getResponsiveConfig();
+                chart.setOption({
+                    grid: { left: newConfig.gridLeft, right: newConfig.gridRight, bottom: newConfig.gridBottom, top: '8%', containLabel: true },
+                    xAxis: { axisLabel: { fontSize: newConfig.axisLabelFontSize, rotate: newConfig.isMobile ? 45 : 20 } },
+                    yAxis: { axisLabel: { fontSize: newConfig.axisLabelFontSize } },
+                    series: [{ label: { fontSize: newConfig.fontSize } }]
+                });
+                chart.resize();
+            });
             
             // 动态闪烁效果（页面可见时运行）
             let highlight = true;
@@ -638,13 +658,14 @@
             const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
             const data2025 = months.map(m => dashboardData.monthly_data['2025']?.[m]?.total || 0);
             const data2026 = months.map(m => dashboardData.monthly_data['2026']?.[m]?.total || 0);
+            const config = getResponsiveConfig();
             
             const option = {
-                tooltip: { trigger: 'axis', textStyle: { fontSize: 14 } },
-                legend: { data: ['2025年', '2026年'], textStyle: { color: '#8a9cc2', fontSize: 14 } },
-                grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-                xAxis: { type: 'category', data: months, axisLabel: { color: '#c8d4e8', fontSize: 12 } },
-                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: 12 } },
+                tooltip: { trigger: 'axis', textStyle: { fontSize: config.fontSize } },
+                legend: { data: ['2025年', '2026年'], textStyle: { color: '#8a9cc2', fontSize: config.legendFontSize } },
+                grid: { left: config.gridLeft, right: config.gridRight, bottom: config.gridBottom, containLabel: true },
+                xAxis: { type: 'category', data: months, axisLabel: { color: '#c8d4e8', fontSize: config.axisLabelFontSize } },
+                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: config.axisLabelFontSize } },
                 series: [
                     { 
                         name: '2025年', 
@@ -675,7 +696,17 @@
                 ]
             };
             chart.setOption(option);
-            window.addEventListener('resize', () => chart.resize());
+            window.addEventListener('resize', () => {
+                const newConfig = getResponsiveConfig();
+                chart.setOption({
+                    tooltip: { textStyle: { fontSize: newConfig.fontSize } },
+                    legend: { textStyle: { fontSize: newConfig.legendFontSize } },
+                    grid: { left: newConfig.gridLeft, right: newConfig.gridRight, bottom: newConfig.gridBottom, containLabel: true },
+                    xAxis: { axisLabel: { fontSize: newConfig.axisLabelFontSize } },
+                    yAxis: { axisLabel: { fontSize: newConfig.axisLabelFontSize } }
+                });
+                chart.resize();
+            });
         }
 
         // ========== 5. 科室同比 ==========
@@ -684,6 +715,7 @@
             const monthName = currentMonth + '月';
             const yoyValues = dashboardData.department_yoy?.[monthName] || [];
             const depts = dashboardData.department_stats?.departments || [];
+            const config = getResponsiveConfig();
             
             // 找出增长前三和下降前三
             const sorted = yoyValues.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v);
@@ -694,15 +726,15 @@
                 tooltip: { 
                     trigger: 'axis', 
                     axisPointer: { type: 'shadow' },
-                    textStyle: { fontSize: 14 },
+                    textStyle: { fontSize: config.fontSize },
                     formatter: function(params) {
                         const d = params[0];
                         return d.name + '<br/>同比: ' + (d.value >= 0 ? '+' : '') + d.value + '篇';
                     }
                 },
-                grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },
-                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: 11, rotate: 30 } },
-                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: 12 } },
+                grid: { left: config.gridLeft, right: config.gridRight, bottom: config.gridBottom, containLabel: true },
+                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: config.isMobile ? 9 : config.axisLabelFontSize, rotate: config.isMobile ? 45 : 30, interval: 0 } },
+                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: config.axisLabelFontSize } },
                 series: [{
                     type: 'bar',
                     data: yoyValues.map((v, i) => {
@@ -719,14 +751,24 @@
                         };
                     }),
                     barWidth: '50%',
-                    label: { show: true, position: 'top', color: '#fff', fontSize: 13, fontWeight: 'bold', formatter: '{c}' },
+                    label: { show: true, position: 'top', color: '#fff', fontSize: config.fontSize - 1, fontWeight: 'bold', formatter: '{c}' },
                     animationDelay: (idx) => idx * 50,
                     animationEasing: 'elasticOut'
                 }],
                 animationDuration: 1500
             };
             chart.setOption(option);
-            window.addEventListener('resize', () => chart.resize());
+            window.addEventListener('resize', () => {
+                const newConfig = getResponsiveConfig();
+                chart.setOption({
+                    tooltip: { textStyle: { fontSize: newConfig.fontSize } },
+                    grid: { left: newConfig.gridLeft, right: newConfig.gridRight, bottom: newConfig.gridBottom, containLabel: true },
+                    xAxis: { axisLabel: { fontSize: newConfig.isMobile ? 9 : newConfig.axisLabelFontSize, rotate: newConfig.isMobile ? 45 : 30 } },
+                    yAxis: { axisLabel: { fontSize: newConfig.axisLabelFontSize } },
+                    series: [{ label: { fontSize: newConfig.fontSize - 1 } }]
+                });
+                chart.resize();
+            });
         }
 
         // ========== 更新指标卡片 ==========
