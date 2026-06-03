@@ -470,10 +470,24 @@
                 }]
             };
             chart.setOption(option);
-            window.addEventListener('resize', () => {
-                chart.setOption(getResponsiveConfig());
+            
+            // 使用命名函数避免重复注册
+            const handleResize = () => {
+                const newConfig = getResponsiveConfig();
+                chart.setOption({
+                    legend: { 
+                        textStyle: { fontSize: newConfig.legendFontSize },
+                        itemWidth: newConfig.isMobile ? 15 : 25,
+                        itemHeight: newConfig.isMobile ? 10 : 14
+                    },
+                    series: [{
+                        radius: newConfig.isMobile ? ['35%', '60%'] : ['40%', '65%'],
+                        label: { fontSize: newConfig.fontSize }
+                    }]
+                });
                 chart.resize();
-            });
+            };
+            window.addEventListener('resize', handleResize);
         }
 
         // ========== 2. 月度科室排名（前三名高亮）==========
@@ -650,6 +664,9 @@
                 });
                 highlight = !highlight;
             }, 1500);
+            
+            // 页面卸载时清除定时器，避免内存泄漏
+            window.addEventListener('beforeunload', () => clearInterval(blinkInterval));
         }
 
         // ========== 4. 月度趋势对比 ==========
