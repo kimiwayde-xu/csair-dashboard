@@ -26,7 +26,7 @@
 
 ```
 vercel-deploy/
-├── index.html          # 主页面(~730行,含图表+轮播)
+├── index.html          # 主页面(~870行,fetch动态加载data.json)
 ├── data.json           # 图表数据(~100行,fetch 动态加载)
 ├── photos.json         # 图片列表(24张图片)
 ├── photos/             # 图片文件夹(24张 jpg/png)
@@ -34,6 +34,10 @@ vercel-deploy/
 ├── .github/            # GitHub Pages 配置
 └── .git/               # Git 仓库
 ```
+
+**已删除文件**:
+- `index_new.html` - 旧模板文件(2026-06-04删除)
+- `add_gallery.py` - 旧添加Gallery工具(2026-06-04删除)
 
 ---
 
@@ -75,9 +79,9 @@ vercel-deploy/
 ### 方式一:使用桌面工具(推荐)
 
 #### 1. 更新图表数据
-双击运行:`~/Desktop/更新宣传看板数据.command`
-- 上传 Excel 文件
-- 自动解析生成 `data.json`
+双击运行:`~/Desktop/更新宣传看板.command`
+- 解析Excel文件(固定路径:`/Volumes/way的固态/工作/2026/宣传/2026部门宣传数据可视化看板.xlsx`)
+- 生成 `data.json` (**只更新JSON,不修改HTML**)
 - 自动 Git 提交推送
 
 #### 2. 更新照片
@@ -89,9 +93,10 @@ vercel-deploy/
 ### 方式二:手动更新
 
 #### 更新图表数据
-1. 上传 Excel 到 `server_v2.py` 服务(http://127.0.0.1:8765)
-2. 服务自动解析并生成 `data.json`
-3. 服务自动 Git 提交推送
+```bash
+cd /Users/xuweijie/.qclaw/workspace/宣传看板大屏
+./update_dashboard.sh [Excel文件路径]
+```
 
 #### 新增/删除图片
 1. 将图片放入 `photos/` 文件夹
@@ -123,10 +128,26 @@ python3 -m http.server 8080
 
 ## 关键设计决策
 
-### 1. 数据完全动态化(2026-06-02 改进)
-- **现状**: `data.json` 和 `photos.json` 均通过 fetch 动态加载
-- **好处**: 更新数据只需修改 JSON 文件,无需修改 HTML
-- **缓存破坏**: fetch 请求带时间戳参数,避免浏览器缓存旧数据
+### 1. 数据完全动态化(2026-06-04 最终实现)
+- **现状**: `index.html` 通过 `fetch('data.json')` 动态加载数据
+- **好处**: 更新数据只需修改 `data.json`,无需修改 HTML
+- **缓存破坏**: fetch 请求带时间戳参数 + `cache: 'no-store'`
+- **关键代码**:
+  ```javascript
+  let dashboardData = null;
+  
+  async function loadData() {
+      const response = await fetch('data.json?t=' + Date.now(), { cache: 'no-store' });
+      dashboardData = await response.json();
+      return true;
+  }
+  
+  window.addEventListener('DOMContentLoaded', async () => {
+      await loadData();
+      initCharts();
+      updateDashboard();
+  });
+  ```
 
 ### 2. 月份选择器动态生成(2026-06-02 新增)
 - **逻辑**: 从 `data.json` 读取该年份所有月份
@@ -234,11 +255,25 @@ python3 -m http.server 8080
 
 **项目负责人**: 徐伟杰  
 **项目位置**: `/Users/xuweijie/.qclaw/workspace/宣传看板大屏/vercel-deploy/`  
-**最后更新**: 2026-06-03 10:14 GMT+8
+**最后更新**: 2026-06-04 09:05 GMT+8
 
 ---
 
 ## 最近更新日志
+
+### 2026-06-04 09:05 - 架构优化与清理
+**修复内容**:
+1. **修复数据不更新问题** - 改为fetch动态加载data.json(之前硬编码在HTML中)
+2. **修复图片轮播被覆盖** - 修改更新脚本,只更新data.json,不修改index.html
+3. **删除旧模板文件** - 删除`index_new.html`和`add_gallery.py`
+
+**架构演进**:
+- ❌ 旧架构: 模板替换(`index_new.html` + `DATA_PLACEHOLDER`)
+- ✅ 新架构: 动态加载(`fetch('data.json')`)
+
+**Git提交**: 
+- `fix: 改为fetch动态加载data.json，解决数据不更新问题`
+- `chore: 删除旧模板文件index_new.html（已改为动态加载data.json）`
 
 ### 2026-06-03 10:14 - Bug修复
 **修复内容**:
