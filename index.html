@@ -97,232 +97,6 @@
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
         }
-
-        /* 照片轮播 */
-        .photo-carousel {
-            position: relative;
-            overflow: hidden;
-            height: 300px;
-        }
-        .photo-carousel img {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            object-fit: contain;
-            background: rgba(10, 14, 23, 0.5);
-            opacity: 0;
-            transition: opacity 0.8s ease-in-out;
-        }
-        .photo-carousel img.active { opacity: 1; z-index: 1; }
-        .carousel-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 2;
-            background: rgba(26, 45, 74, 0.7);
-            color: #fff;
-            border: 1px solid rgba(74, 144, 217, 0.4);
-            width: 44px; height: 44px;
-            border-radius: 50%;
-            font-size: 22px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .carousel-btn:hover { background: rgba(74, 144, 217, 0.6); }
-        .carousel-prev { left: 15px; }
-        .carousel-next { right: 15px; }
-        .carousel-dots {
-            position: absolute;
-            bottom: 12px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 2;
-            display: flex;
-            gap: 8px;
-        }
-        .carousel-dot {
-            width: 10px; height: 10px;
-            border-radius: 50%;
-            background: rgba(126, 184, 218, 0.4);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .carousel-dot.active { background: #4a90d9; transform: scale(1.3); }
-
-        /* 刷新按钮 */
-        .refresh-btn {
-            background: linear-gradient(135deg, #4a90d9 0%, #3a7bc8 100%);
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .refresh-btn:hover {
-            background: linear-gradient(135deg, #5a9de9 0%, #4a8dd8 100%);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(74, 144, 217, 0.3);
-        }
-        .refresh-btn:active {
-            transform: translateY(0);
-        }
-        .refresh-btn.loading {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        .refresh-icon {
-            display: inline-block;
-            transition: transform 0.3s;
-        }
-        .refresh-btn:hover .refresh-icon {
-            transform: rotate(90deg);
-        }
-        .refresh-btn.loading .refresh-icon {
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* ========== 响应式布局 ========== */
-        
-        /* 大屏幕（>1400px）：保持4列布局 */
-        @media (min-width: 1401px) {
-            .dashboard { grid-template-columns: repeat(4, 1fr); }
-            .metric-cards { grid-template-columns: repeat(4, 1fr); }
-        }
-        
-        /* 中大屏幕（1200px - 1400px）：3列布局 */
-        @media (max-width: 1400px) {
-            .dashboard { grid-template-columns: repeat(3, 1fr); }
-            .metric-cards { grid-template-columns: repeat(4, 1fr); }
-            .card[style*="grid-column: span 4"] { grid-column: span 3 !important; }
-            .card[style*="grid-column: span 2"] { grid-column: span 2 !important; }
-        }
-        
-        /* 中等屏幕（992px - 1199px）：2列布局 */
-        @media (max-width: 1199px) {
-            .dashboard { grid-template-columns: repeat(2, 1fr); }
-            .metric-cards { grid-template-columns: repeat(2, 1fr); }
-            .card[style*="grid-column: span 4"] { grid-column: span 2 !important; }
-            .card[style*="grid-column: span 2"] { grid-column: span 2 !important; }
-            .header h1 { font-size: 28px; letter-spacing: 2px; }
-            .metric-value { font-size: 36px; }
-        }
-        
-        /* 平板（768px - 991px）：2列布局，调整间距 */
-        @media (max-width: 991px) {
-            body { padding: 15px; }
-            .header { padding: 20px 25px; }
-            .header h1 { font-size: 24px; }
-            .controls { flex-wrap: wrap; gap: 15px; }
-            .control-group { flex: 0 0 auto; }
-            .metric-cards { gap: 12px; }
-            .metric-card { padding: 20px; }
-            .metric-value { font-size: 32px; }
-            .dashboard { gap: 15px; }
-            .card { padding: 20px; }
-            .card-title { font-size: 18px; margin-bottom: 15px; }
-            .chart-container { height: 260px; }
-            .yearly-chart { height: 220px; }
-            .photo-carousel { height: 250px; }
-        }
-        
-        /* 手机横屏（576px - 767px）：单列布局 */
-        @media (max-width: 767px) {
-            body { padding: 10px; }
-            .header { 
-                padding: 15px 20px; 
-                flex-direction: column; 
-                gap: 10px; 
-                text-align: center; 
-            }
-            .header h1 { font-size: 20px; }
-            #datetime { font-size: 14px; }
-            .controls { 
-                flex-direction: column; 
-                align-items: stretch; 
-                gap: 12px; 
-            }
-            .control-group { 
-                justify-content: space-between; 
-            }
-            .metric-cards { 
-                grid-template-columns: repeat(2, 1fr); 
-                gap: 10px; 
-            }
-            .metric-card { padding: 15px; }
-            .metric-label { font-size: 14px; }
-            .metric-value { font-size: 28px; }
-            .dashboard { 
-                grid-template-columns: 1fr; 
-                gap: 12px; 
-            }
-            .card[style*="grid-column"] { 
-                grid-column: span 1 !important; 
-            }
-            .card { padding: 18px; }
-            .card-title { font-size: 16px; margin-bottom: 12px; }
-            .chart-container { height: 250px; }
-            .yearly-chart { height: 200px; }
-            .photo-carousel { height: 220px; }
-            .carousel-btn { 
-                width: 36px; 
-                height: 36px; 
-                font-size: 18px; 
-            }
-        }
-        
-        /* 手机竖屏（<576px）：完全单列，优化触摸操作 */
-        @media (max-width: 575px) {
-            body { padding: 8px; }
-            .header { padding: 12px 15px; }
-            .header h1 { 
-                font-size: 16px; 
-                letter-spacing: 1px; 
-            }
-            #datetime { font-size: 12px; }
-            .controls { padding: 12px 15px; }
-            .control-label { font-size: 14px; }
-            select { 
-                padding: 8px 12px; 
-                font-size: 14px; 
-            }
-            .refresh-btn { 
-                padding: 8px 14px; 
-                font-size: 13px; 
-            }
-            .metric-cards { gap: 8px; }
-            .metric-card { padding: 12px; }
-            .metric-label { font-size: 13px; margin-bottom: 8px; }
-            .metric-value { font-size: 24px; }
-            .card { padding: 15px; }
-            .card-title { 
-                font-size: 15px; 
-                margin-bottom: 10px; 
-            }
-            .chart-container { height: 220px; }
-            .yearly-chart { height: 180px; }
-            .photo-carousel { height: 200px; }
-            .carousel-btn { 
-                width: 32px; 
-                height: 32px; 
-                font-size: 16px; 
-            }
-            .carousel-prev { left: 8px; }
-            .carousel-next { right: 8px; }
-            .carousel-dots { gap: 6px; }
-            .carousel-dot { 
-                width: 8px; 
-                height: 8px; 
-            }
-        }
     </style>
 </head>
 <body>
@@ -334,7 +108,7 @@
     <div class="controls">
         <div class="control-group">
             <span class="control-label">年份:</span>
-            <select id="yearSelect" onchange="generateMonthOptions(); updateDashboard();">
+            <select id="yearSelect" onchange="updateDashboard()">
                 <option value="2026" selected>2026年</option>
                 <option value="2025">2025年</option>
             </select>
@@ -342,13 +116,13 @@
         <div class="control-group">
             <span class="control-label">月份:</span>
             <select id="monthSelect" onchange="updateDashboard()">
-                <!-- 月份选项由 JavaScript 动态生成 -->
+                <option value="1">1月</option>
+                <option value="2">2月</option>
+                <option value="3">3月</option>
+                <option value="4">4月</option>
+                <option value="5" selected>5月</option>
             </select>
         </div>
-        <button class="refresh-btn" onclick="refreshData()">
-            <span class="refresh-icon">🔄</span>
-            <span>刷新数据</span>
-        </button>
     </div>
 
     <div class="metric-cards">
@@ -395,42 +169,14 @@
             <div class="card-title">🏆 全年科室稿件排名</div>
             <div class="chart-container yearly-chart" id="yearlyDeptChart"></div>
         </div>
-
-        <div class="card" style="grid-column: span 4;">
-            <div class="card-title">📸 登稿视窗</div>
-            <div class="photo-carousel" id="photoCarousel">
-                <button class="carousel-btn carousel-prev" onclick="prevPhoto()">‹</button>
-                <button class="carousel-btn carousel-next" onclick="nextPhoto()">›</button>
-                <div class="carousel-dots" id="carouselDots"></div>
-            </div>
-        </div>
     </div>
 
     <script>
         // ========== 数据定义 ==========
-        const dashboardData = {"platform_distribution": {"platforms": ["内部媒体", "行业媒体", "主流媒体", "公众号", "视频号"], "values": [38, 4, 38, 18, 0], "percentages": [38.8, 4.1, 38.8, 18.4]}, "department_stats": {"departments": ["虹桥值机", "虹桥高端服务室", "虹桥服务室", "浦东值机室", "浦东高端服务室", "浦东服务室", "客机保障室", "货机保障室", "勤务保障室", "运行管理室", "经营管理室", "安全管理室"], "values": [64, 51, 39, 54, 48, 40, 32, 13, 9, 18, 39, 3]}, "monthly_data": {"2025": {"1月": {"total": 28, "departments": [7, 9, 10, 10, 11, 8, 6, 4, 3, 4, 4, 0]}, "2月": {"total": 20, "departments": [3, 14, 3, 12, 18, 4, 4, 2, 1, 10, 2, 1]}, "3月": {"total": 28, "departments": [2, 1, 9, 14, 12, 5, 4, 7, 3, 1, 3, 0]}, "4月": {"total": 20, "departments": [5, 3, 3, 5, 9, 5, 6, 1, 2, 2, 5, 1]}, "5月": {"total": 23, "departments": [9, 7, 5, 6, 7, 5, 5, 0, 3, 8, 5, 1]}, "6月": {"total": 22, "departments": [4, 4, 6, 13, 12, 8, 3, 1, 0, 8, 9, 1]}, "7月": {"total": 9, "departments": [3, 0, 4, 2, 3, 3, 1, 1, 1, 0, 4, 0]}, "8月": {"total": 53, "departments": [45, 42, 45, 3, 3, 3, 44, 4, 4, 0, 46, 1]}, "9月": {"total": 22, "departments": [9, 11, 8, 4, 4, 4, 2, 1, 1, 3, 12, 2]}, "10月": {"total": 20, "departments": [11, 8, 2, 12, 9, 7, 3, 2, 2, 0, 3, 1]}, "11月": {"total": 28, "departments": [15, 12, 3, 19, 17, 8, 1, 2, 0, 1, 2, 1]}, "12月": {"total": 29, "departments": [5, 5, 0, 4, 5, 4, 6, 3, 3, 2, 11, 1]}}, "2026": {"1月": {"total": 15, "departments": [7, 4, 3, 6, 1, 2, 8, 7, 2, 1, 0, 0], "platform": {"内部媒体": 8, "公众号": 1, "行业媒体": 1, "主流媒体": 2}}, "2月": {"total": 28, "departments": [22, 19, 13, 19, 17, 13, 12, 1, 1, 7, 14, 0], "platform": {"主流媒体": 16, "内部媒体": 8, "公众号": 3, "行业媒体": 1}}, "3月": {"total": 24, "departments": [15, 15, 8, 14, 14, 9, 5, 2, 1, 9, 8, 0], "platform": {"内部媒体": 7, "主流媒体": 10, "公众号": 6, "行业媒体": 1}}, "4月": {"total": 19, "departments": [13, 10, 10, 9, 11, 9, 3, 2, 3, 0, 8, 2], "platform": {"内部媒体": 9, "公众号": 3, "主流媒体": 6, "行业媒体": 1}}, "5月": {"total": 12, "departments": [5, 2, 4, 5, 4, 7, 4, 1, 2, 1, 7, 1], "platform": {"主流媒体": 3, "内部媒体": 4, "公众号": 4}}, "6月": {"total": 3, "departments": [2, 1, 1, 1, 1, 0, 0, 0, 0, 0, 2, 0], "platform": {"内部媒体": 2, "公众号": 1}}, "7月": {"total": 0, "departments": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "platform": {}}, "8月": {"total": 0, "departments": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "platform": {}}, "9月": {"total": 0, "departments": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "platform": {}}, "10月": {"total": 0, "departments": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "platform": {}}, "11月": {"total": 0, "departments": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "platform": {}}, "12月": {"total": 0, "departments": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "platform": {}}}}, "year_over_year": {"1月": {"total": -13, "departments": [0, -5, -7, -4, -10, -6, 2, 3, -1, -3, -4, 0]}, "2月": {"total": 8, "departments": [19, 5, 10, 7, -1, 9, 8, -1, 0, -3, 12, -1]}, "3月": {"total": -4, "departments": [13, 14, -1, 0, 2, 4, 1, -5, -2, 8, 5, 0]}, "4月": {"total": -1, "departments": [8, 7, 7, 4, 2, 4, -3, 1, 1, -2, 3, 1]}, "5月": {"total": -11, "departments": [-4, -5, -1, -1, -3, 2, -1, 1, -1, -7, 2, 0]}, "6月": {"total": -19, "departments": [-2, -3, -5, -12, -11, -8, -3, -1, 0, -8, -7, -1]}, "7月": {"total": -9, "departments": [-3, 0, -4, -2, -3, -3, -1, -1, -1, 0, -4, 0]}, "8月": {"total": -53, "departments": [-45, -42, -45, -3, -3, -3, -44, -4, -4, 0, -46, -1]}, "9月": {"total": -22, "departments": [-9, -11, -8, -4, -4, -4, -2, -1, -1, -3, -12, -2]}, "10月": {"total": -20, "departments": [-11, -8, -2, -12, -9, -7, -3, -2, -2, 0, -3, -1]}, "11月": {"total": -28, "departments": [-15, -12, -3, -19, -17, -8, -1, -2, 0, -1, -2, -1]}, "12月": {"total": -29, "departments": [-5, -5, 0, -4, -5, -4, -6, -3, -3, -2, -11, -1]}}, "quarter_yoy": {"一季度": {"2025": 76, "2026": 67, "yoy": -9}, "二季度": {"2025": 65, "2026": 34, "yoy": -31}, "三季度": {"2025": 84, "2026": 0, "yoy": -84}, "四季度": {"2025": 77, "2026": 0, "yoy": -77}}, "summary": {"total_articles": 98, "monthly_avg": 8.17, "current_month_articles": 3, "current_year": 2026, "current_month": 5}, "current_month_platform": {"主流媒体": 3, "内部媒体": 4, "公众号": 4}, "department_yoy": {"1月": [0, -5, -7, -4, -10, -6, 2, 3, -1, -3, -4, 0], "2月": [19, 5, 10, 7, -1, 9, 8, -1, 0, -3, 12, -1], "3月": [13, 14, -1, 0, 2, 4, 1, -5, -2, 8, 5, 0], "4月": [8, 7, 7, 4, 2, 4, -3, 1, 1, -2, 3, 1], "5月": [-4, -5, -1, -1, -3, 2, -1, 1, -1, -7, 2, 0], "6月": [-2, -3, -5, -12, -11, -8, -3, -1, 0, -8, -7, -1], "7月": [-3, 0, -4, -2, -3, -3, -1, -1, -1, 0, -4, 0], "8月": [-45, -42, -45, -3, -3, -3, -44, -4, -4, 0, -46, -1], "9月": [-9, -11, -8, -4, -4, -4, -2, -1, -1, -3, -12, -2], "10月": [-11, -8, -2, -12, -9, -7, -3, -2, -2, 0, -3, -1], "11月": [-15, -12, -3, -19, -17, -8, -1, -2, 0, -1, -2, -1], "12月": [-5, -5, 0, -4, -5, -4, -6, -3, -3, -2, -11, -1]}, "monthly_yoy_totals": {"1月": -13, "2月": 8, "3月": -4, "4月": -1, "5月": -11, "6月": -19, "7月": -9, "8月": -53, "9月": -22, "10月": -20, "11月": -28, "12月": -29}, "monthly_platform": {"1": {"内部媒体": 8, "公众号": 1, "行业媒体": 1, "主流媒体": 2}, "2": {"主流媒体": 16, "内部媒体": 8, "公众号": 3, "行业媒体": 1}, "3": {"内部媒体": 7, "主流媒体": 10, "公众号": 6, "行业媒体": 1}, "4": {"内部媒体": 9, "公众号": 3, "主流媒体": 6, "行业媒体": 1}, "5": {"主流媒体": 3, "内部媒体": 4, "公众号": 4}, "6": {"内部媒体": 2, "公众号": 1}, "7": {}, "8": {}, "9": {}, "10": {}, "11": {}, "12": {}}};
+        const dashboardData = {"platform_distribution": {"platforms": ["内部媒体", "行业媒体", "主流媒体", "公众号", "视频号"], "values": [38, 4, 38, 20, 0], "percentages": [38.0, 4.0, 38.0, 20.0]}, "department_stats": {"departments": ["虹桥值机", "虹桥高端服务室", "虹桥服务室", "浦东值机室", "浦东高端服务室", "浦东服务室", "客机保障室", "货机保障室", "勤务保障室", "运行管理室", "经营管理室", "安全管理室"], "values": [65, 52, 40, 54, 48, 40, 32, 13, 9, 18, 40, 3]}, "monthly_data": {"2025": {"1月": {"total": 28, "departments": [7, 9, 10, 10, 11, 8, 6, 4, 3, 4, 4, 0]}, "2月": {"total": 20, "departments": [3, 14, 3, 12, 18, 4, 4, 2, 1, 10, 2, 1]}, "3月": {"total": 28, "departments": [2, 1, 9, 14, 12, 5, 4, 7, 3, 1, 3, 0]}, "4月": {"total": 20, "departments": [5, 3, 3, 5, 9, 5, 6, 1, 2, 2, 5, 1]}, "5月": {"total": 23, "departments": [9, 7, 5, 6, 7, 5, 5, 0, 3, 8, 5, 1]}, "6月": {"total": 22, "departments": [4, 4, 6, 13, 12, 8, 3, 1, 0, 8, 9, 1]}, "7月": {"total": 9, "departments": [3, 0, 4, 2, 3, 3, 1, 1, 1, 0, 4, 0]}, "8月": {"total": 53, "departments": [45, 42, 45, 3, 3, 3, 44, 4, 4, 0, 46, 1]}, "9月": {"total": 22, "departments": [9, 11, 8, 4, 4, 4, 2, 1, 1, 3, 12, 2]}, "10月": {"total": 20, "departments": [11, 8, 2, 12, 9, 7, 3, 2, 2, 0, 3, 1]}, "11月": {"total": 28, "departments": [15, 12, 3, 19, 17, 8, 1, 2, 0, 1, 2, 1]}, "12月": {"total": 29, "departments": [5, 5, 0, 4, 5, 4, 6, 3, 3, 2, 11, 1]}}, "2026": {"1月": {"total": 15, "departments": [7, 4, 3, 6, 1, 2, 8, 7, 2, 1, 0, 0], "platform": {"内部媒体": 8, "公众号": 1, "行业媒体": 1, "主流媒体": 2}}, "2月": {"total": 28, "departments": [22, 19, 13, 19, 17, 13, 12, 1, 1, 7, 14, 0], "platform": {"主流媒体": 16, "内部媒体": 8, "公众号": 3, "行业媒体": 1}}, "3月": {"total": 24, "departments": [15, 15, 8, 14, 14, 9, 5, 2, 1, 9, 8, 0], "platform": {"内部媒体": 7, "主流媒体": 10, "公众号": 6, "行业媒体": 1}}, "4月": {"total": 19, "departments": [13, 10, 10, 9, 11, 9, 3, 2, 3, 0, 8, 2], "platform": {"内部媒体": 9, "公众号": 3, "主流媒体": 6, "行业媒体": 1}}, "5月": {"total": 12, "departments": [5, 2, 4, 5, 4, 7, 4, 1, 2, 1, 7, 1], "platform": {"主流媒体": 3, "内部媒体": 4, "公众号": 4}}, "6月": {"total": 5, "departments": [3, 2, 2, 1, 1, 0, 0, 0, 0, 0, 3, 0], "platform": {"内部媒体": 2, "公众号": 3}}, "7月": {"total": 0, "departments": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "platform": {}}, "8月": {"total": 0, "departments": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "platform": {}}, "9月": {"total": 0, "departments": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "platform": {}}, "10月": {"total": 0, "departments": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "platform": {}}, "11月": {"total": 0, "departments": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "platform": {}}, "12月": {"total": 0, "departments": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "platform": {}}}}, "year_over_year": {"1月": {"total": -13, "departments": [0, -5, -7, -4, -10, -6, 2, 3, -1, -3, -4, 0]}, "2月": {"total": 8, "departments": [19, 5, 10, 7, -1, 9, 8, -1, 0, -3, 12, -1]}, "3月": {"total": -4, "departments": [13, 14, -1, 0, 2, 4, 1, -5, -2, 8, 5, 0]}, "4月": {"total": -1, "departments": [8, 7, 7, 4, 2, 4, -3, 1, 1, -2, 3, 1]}, "5月": {"total": -11, "departments": [-4, -5, -1, -1, -3, 2, -1, 1, -1, -7, 2, 0]}, "6月": {"total": -17, "departments": [-1, -2, -4, -12, -11, -8, -3, -1, 0, -8, -6, -1]}, "7月": {"total": -9, "departments": [-3, 0, -4, -2, -3, -3, -1, -1, -1, 0, -4, 0]}, "8月": {"total": -53, "departments": [-45, -42, -45, -3, -3, -3, -44, -4, -4, 0, -46, -1]}, "9月": {"total": -22, "departments": [-9, -11, -8, -4, -4, -4, -2, -1, -1, -3, -12, -2]}, "10月": {"total": -20, "departments": [-11, -8, -2, -12, -9, -7, -3, -2, -2, 0, -3, -1]}, "11月": {"total": -28, "departments": [-15, -12, -3, -19, -17, -8, -1, -2, 0, -1, -2, -1]}, "12月": {"total": -29, "departments": [-5, -5, 0, -4, -5, -4, -6, -3, -3, -2, -11, -1]}}, "quarter_yoy": {"一季度": {"2025": 76, "2026": 67, "yoy": -9}, "二季度": {"2025": 65, "2026": 36, "yoy": -29}, "三季度": {"2025": 84, "2026": 0, "yoy": -84}, "四季度": {"2025": 77, "2026": 0, "yoy": -77}}, "summary": {"total_articles": 100, "monthly_avg": 8.33, "current_month_articles": 5, "current_year": 2026, "current_month": 5}, "current_month_platform": {"主流媒体": 3, "内部媒体": 4, "公众号": 4}, "department_yoy": {"1月": [0, -5, -7, -4, -10, -6, 2, 3, -1, -3, -4, 0], "2月": [19, 5, 10, 7, -1, 9, 8, -1, 0, -3, 12, -1], "3月": [13, 14, -1, 0, 2, 4, 1, -5, -2, 8, 5, 0], "4月": [8, 7, 7, 4, 2, 4, -3, 1, 1, -2, 3, 1], "5月": [-4, -5, -1, -1, -3, 2, -1, 1, -1, -7, 2, 0], "6月": [-1, -2, -4, -12, -11, -8, -3, -1, 0, -8, -6, -1], "7月": [-3, 0, -4, -2, -3, -3, -1, -1, -1, 0, -4, 0], "8月": [-45, -42, -45, -3, -3, -3, -44, -4, -4, 0, -46, -1], "9月": [-9, -11, -8, -4, -4, -4, -2, -1, -1, -3, -12, -2], "10月": [-11, -8, -2, -12, -9, -7, -3, -2, -2, 0, -3, -1], "11月": [-15, -12, -3, -19, -17, -8, -1, -2, 0, -1, -2, -1], "12月": [-5, -5, 0, -4, -5, -4, -6, -3, -3, -2, -11, -1]}, "monthly_yoy_totals": {"1月": -13, "2月": 8, "3月": -4, "4月": -1, "5月": -11, "6月": -17, "7月": -9, "8月": -53, "9月": -22, "10月": -20, "11月": -28, "12月": -29}, "monthly_platform": {"1": {"内部媒体": 8, "公众号": 1, "行业媒体": 1, "主流媒体": 2}, "2": {"主流媒体": 16, "内部媒体": 8, "公众号": 3, "行业媒体": 1}, "3": {"内部媒体": 7, "主流媒体": 10, "公众号": 6, "行业媒体": 1}, "4": {"内部媒体": 9, "公众号": 3, "主流媒体": 6, "行业媒体": 1}, "5": {"主流媒体": 3, "内部媒体": 4, "公众号": 4}, "6": {"内部媒体": 2, "公众号": 3}, "7": {}, "8": {}, "9": {}, "10": {}, "11": {}, "12": {}}};
 
         let currentYear = 2026;
         let currentMonth = 5;
-
-        // ========== 响应式工具函数 ==========
-        function getResponsiveConfig() {
-            const width = window.innerWidth;
-            const isMobile = width < 768;
-            const isSmallMobile = width < 576;
-            
-            return {
-                fontSize: isSmallMobile ? 11 : isMobile ? 12 : 14,
-                axisLabelFontSize: isSmallMobile ? 10 : isMobile ? 11 : 12,
-                titleFontSize: isSmallMobile ? 12 : isMobile ? 14 : 16,
-                legendFontSize: isSmallMobile ? 10 : isMobile ? 11 : 13,
-                gridLeft: isMobile ? '3%' : '5%',
-                gridRight: isMobile ? '3%' : '5%',
-                gridBottom: isMobile ? '10%' : '15%',
-                isMobile: isMobile,
-                isSmallMobile: isSmallMobile
-            };
-        }
 
         // ========== 初始化所有图表 ==========
         function initCharts() {
@@ -446,48 +192,21 @@
         function initPlatformChart() {
             const chart = echarts.init(document.getElementById('platformChart'));
             const d = dashboardData.platform_distribution;
-            const config = getResponsiveConfig();
             const option = {
                 tooltip: { trigger: 'item', formatter: '{b}: {c}篇 ({d}%)' },
-                legend: { 
-                    bottom: 0, 
-                    textStyle: { color: '#8a9cc2', fontSize: config.legendFontSize },
-                    itemWidth: config.isMobile ? 15 : 25,
-                    itemHeight: config.isMobile ? 10 : 14
-                },
+                legend: { bottom: 0, textStyle: { color: '#8a9cc2', fontSize: 14 } },
                 series: [{
                     type: 'pie',
-                    radius: config.isMobile ? ['35%', '60%'] : ['40%', '65%'],
+                    radius: ['40%', '65%'],
                     center: ['50%', '45%'],
                     data: d.platforms.map((p, i) => ({ value: d.values[i], name: p })),
                     emphasis: { itemStyle: { shadowBlur: 20, shadowColor: 'rgba(74,144,217,0.5)' } },
-                    label: { 
-                        color: '#c8d4e8', 
-                        fontSize: config.fontSize,
-                        formatter: config.isMobile ? '{b}' : '{b}\n{c}篇 ({d}%)'
-                    },
+                    label: { color: '#c8d4e8', fontSize: 14, formatter: '{b}\n{c}篇 ({d}%)' },
                     itemStyle: { borderRadius: 6, borderColor: '#0a0e17', borderWidth: 2 }
                 }]
             };
             chart.setOption(option);
-            
-            // 使用命名函数避免重复注册
-            const handleResize = () => {
-                const newConfig = getResponsiveConfig();
-                chart.setOption({
-                    legend: { 
-                        textStyle: { fontSize: newConfig.legendFontSize },
-                        itemWidth: newConfig.isMobile ? 15 : 25,
-                        itemHeight: newConfig.isMobile ? 10 : 14
-                    },
-                    series: [{
-                        radius: newConfig.isMobile ? ['35%', '60%'] : ['40%', '65%'],
-                        label: { fontSize: newConfig.fontSize }
-                    }]
-                });
-                chart.resize();
-            };
-            window.addEventListener('resize', handleResize);
+            window.addEventListener('resize', () => chart.resize());
         }
 
         // ========== 2. 月度科室排名（前三名高亮）==========
@@ -499,7 +218,6 @@
             
             const depts = dashboardData.department_stats.departments;
             const values = monthData.departments;
-            const config = getResponsiveConfig();
             
             // 找出前三名的索引
             const sorted = values.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v);
@@ -510,9 +228,9 @@
             
             const option = {
                 tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-                grid: { left: config.gridLeft, right: config.gridRight, bottom: config.gridBottom, containLabel: true },
-                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: config.axisLabelFontSize, rotate: config.isMobile ? 45 : 20, interval: 0 } },
-                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: config.axisLabelFontSize } },
+                grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
+                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: 12, rotate: 20 } },
+                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: 12 } },
                 series: [{
                     type: 'bar',
                     data: values.map((v, i) => {
@@ -537,23 +255,14 @@
                         };
                     }),
                     barWidth: '50%',
-                    label: { show: true, position: 'top', color: '#fff', fontSize: config.fontSize, fontWeight: 'bold' },
+                    label: { show: true, position: 'top', color: '#fff', fontSize: 14, fontWeight: 'bold' },
                     animationDelay: (idx) => idx * 50,
                     animationEasing: 'elasticOut'
                 }],
                 animationDuration: 1500
             };
             chart.setOption(option);
-            window.addEventListener('resize', () => {
-                const newConfig = getResponsiveConfig();
-                chart.setOption({
-                    grid: { left: newConfig.gridLeft, right: newConfig.gridRight, bottom: newConfig.gridBottom, containLabel: true },
-                    xAxis: { axisLabel: { fontSize: newConfig.axisLabelFontSize, rotate: newConfig.isMobile ? 45 : 20 } },
-                    yAxis: { axisLabel: { fontSize: newConfig.axisLabelFontSize } },
-                    series: [{ label: { fontSize: newConfig.fontSize } }]
-                });
-                chart.resize();
-            });
+            window.addEventListener('resize', () => chart.resize());
         }
 
         // ========== 3. 全年科室排名（动画+前三高亮）==========
@@ -562,7 +271,6 @@
             const deptData = dashboardData.department_stats;
             const depts = deptData.departments;
             const values = deptData.values;
-            const config = getResponsiveConfig();
             
             // 找出前三名
             const sorted = values.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v);
@@ -571,9 +279,9 @@
             
             const option = {
                 tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-                grid: { left: config.gridLeft, right: config.gridRight, bottom: config.gridBottom, top: '8%', containLabel: true },
-                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: config.axisLabelFontSize, rotate: config.isMobile ? 45 : 20, interval: 0 } },
-                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: config.axisLabelFontSize } },
+                grid: { left: '3%', right: '4%', bottom: '12%', top: '8%', containLabel: true },
+                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: 12, rotate: 20 } },
+                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: 12 } },
                 series: [{
                     type: 'bar',
                     data: values.map((v, i) => {
@@ -604,7 +312,7 @@
                         show: true, 
                         position: 'top', 
                         color: '#fff', 
-                        fontSize: config.fontSize, 
+                        fontSize: 14, 
                         fontWeight: 'bold',
                         formatter: function(params) {
                             const rank = sorted.findIndex(x => x.i === params.dataIndex);
@@ -620,16 +328,7 @@
                 }]
             };
             chart.setOption(option);
-            window.addEventListener('resize', () => {
-                const newConfig = getResponsiveConfig();
-                chart.setOption({
-                    grid: { left: newConfig.gridLeft, right: newConfig.gridRight, bottom: newConfig.gridBottom, top: '8%', containLabel: true },
-                    xAxis: { axisLabel: { fontSize: newConfig.axisLabelFontSize, rotate: newConfig.isMobile ? 45 : 20 } },
-                    yAxis: { axisLabel: { fontSize: newConfig.axisLabelFontSize } },
-                    series: [{ label: { fontSize: newConfig.fontSize } }]
-                });
-                chart.resize();
-            });
+            window.addEventListener('resize', () => chart.resize());
             
             // 动态闪烁效果（页面可见时运行）
             let highlight = true;
@@ -664,9 +363,6 @@
                 });
                 highlight = !highlight;
             }, 1500);
-            
-            // 页面卸载时清除定时器，避免内存泄漏
-            window.addEventListener('beforeunload', () => clearInterval(blinkInterval));
         }
 
         // ========== 4. 月度趋势对比 ==========
@@ -675,14 +371,13 @@
             const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
             const data2025 = months.map(m => dashboardData.monthly_data['2025']?.[m]?.total || 0);
             const data2026 = months.map(m => dashboardData.monthly_data['2026']?.[m]?.total || 0);
-            const config = getResponsiveConfig();
             
             const option = {
-                tooltip: { trigger: 'axis', textStyle: { fontSize: config.fontSize } },
-                legend: { data: ['2025年', '2026年'], textStyle: { color: '#8a9cc2', fontSize: config.legendFontSize } },
-                grid: { left: config.gridLeft, right: config.gridRight, bottom: config.gridBottom, containLabel: true },
-                xAxis: { type: 'category', data: months, axisLabel: { color: '#c8d4e8', fontSize: config.axisLabelFontSize } },
-                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: config.axisLabelFontSize } },
+                tooltip: { trigger: 'axis', textStyle: { fontSize: 14 } },
+                legend: { data: ['2025年', '2026年'], textStyle: { color: '#8a9cc2', fontSize: 14 } },
+                grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
+                xAxis: { type: 'category', data: months, axisLabel: { color: '#c8d4e8', fontSize: 12 } },
+                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: 12 } },
                 series: [
                     { 
                         name: '2025年', 
@@ -713,17 +408,7 @@
                 ]
             };
             chart.setOption(option);
-            window.addEventListener('resize', () => {
-                const newConfig = getResponsiveConfig();
-                chart.setOption({
-                    tooltip: { textStyle: { fontSize: newConfig.fontSize } },
-                    legend: { textStyle: { fontSize: newConfig.legendFontSize } },
-                    grid: { left: newConfig.gridLeft, right: newConfig.gridRight, bottom: newConfig.gridBottom, containLabel: true },
-                    xAxis: { axisLabel: { fontSize: newConfig.axisLabelFontSize } },
-                    yAxis: { axisLabel: { fontSize: newConfig.axisLabelFontSize } }
-                });
-                chart.resize();
-            });
+            window.addEventListener('resize', () => chart.resize());
         }
 
         // ========== 5. 科室同比 ==========
@@ -732,7 +417,6 @@
             const monthName = currentMonth + '月';
             const yoyValues = dashboardData.department_yoy?.[monthName] || [];
             const depts = dashboardData.department_stats?.departments || [];
-            const config = getResponsiveConfig();
             
             // 找出增长前三和下降前三
             const sorted = yoyValues.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v);
@@ -743,15 +427,15 @@
                 tooltip: { 
                     trigger: 'axis', 
                     axisPointer: { type: 'shadow' },
-                    textStyle: { fontSize: config.fontSize },
+                    textStyle: { fontSize: 14 },
                     formatter: function(params) {
                         const d = params[0];
                         return d.name + '<br/>同比: ' + (d.value >= 0 ? '+' : '') + d.value + '篇';
                     }
                 },
-                grid: { left: config.gridLeft, right: config.gridRight, bottom: config.gridBottom, containLabel: true },
-                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: config.isMobile ? 9 : config.axisLabelFontSize, rotate: config.isMobile ? 45 : 30, interval: 0 } },
-                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: config.axisLabelFontSize } },
+                grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },
+                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: 11, rotate: 30 } },
+                yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: 12 } },
                 series: [{
                     type: 'bar',
                     data: yoyValues.map((v, i) => {
@@ -768,24 +452,14 @@
                         };
                     }),
                     barWidth: '50%',
-                    label: { show: true, position: 'top', color: '#fff', fontSize: config.fontSize - 1, fontWeight: 'bold', formatter: '{c}' },
+                    label: { show: true, position: 'top', color: '#fff', fontSize: 13, fontWeight: 'bold', formatter: '{c}' },
                     animationDelay: (idx) => idx * 50,
                     animationEasing: 'elasticOut'
                 }],
                 animationDuration: 1500
             };
             chart.setOption(option);
-            window.addEventListener('resize', () => {
-                const newConfig = getResponsiveConfig();
-                chart.setOption({
-                    tooltip: { textStyle: { fontSize: newConfig.fontSize } },
-                    grid: { left: newConfig.gridLeft, right: newConfig.gridRight, bottom: newConfig.gridBottom, containLabel: true },
-                    xAxis: { axisLabel: { fontSize: newConfig.isMobile ? 9 : newConfig.axisLabelFontSize, rotate: newConfig.isMobile ? 45 : 30 } },
-                    yAxis: { axisLabel: { fontSize: newConfig.axisLabelFontSize } },
-                    series: [{ label: { fontSize: newConfig.fontSize - 1 } }]
-                });
-                chart.resize();
-            });
+            window.addEventListener('resize', () => chart.resize());
         }
 
         // ========== 更新指标卡片 ==========
@@ -818,144 +492,11 @@
 
         // ========== 页面加载完成后初始化 ==========
         window.addEventListener('DOMContentLoaded', () => {
-            generateMonthOptions(); // 动态生成月份选项（会更新currentMonth）
             initCharts();
-            updateDashboard(); // 确保标题与当前月份一致
-            loadPhotos();
             setInterval(() => {
                 document.getElementById('datetime').textContent = new Date().toLocaleString('zh-CN');
             }, 1000);
         });
-
-        // ========== 照片轮播 ==========
-        let photos = [];
-        let currentPhotoIndex = 0;
-        let photoTimer = null;
-
-        function loadPhotos() {
-            fetch('photos.json?t=' + Date.now(), { cache: 'no-store' })
-                .then(r => r.json())
-                .then(data => {
-                    photos = data.photos || [];
-                    if (!photos.length) return;
-                    const carousel = document.getElementById('photoCarousel');
-                    const dots = document.getElementById('carouselDots');
-
-                    photos.forEach((p, i) => {
-                        const img = document.createElement('img');
-                        img.src = p.path;
-                        img.alt = p.title;
-                        if (i === 0) img.classList.add('active');
-                        carousel.insertBefore(img, dots);
-                    });
-
-                    photos.forEach((p, i) => {
-                        const dot = document.createElement('span');
-                        dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
-                        dot.onclick = () => goToPhoto(i);
-                        dots.appendChild(dot);
-                    });
-
-                    startPhotoTimer();
-                })
-                .catch(e => console.error('加载照片失败:', e));
-        }
-
-        function updatePhotos() {
-            if (!photos.length) return;
-            const imgs = document.querySelectorAll('#photoCarousel img');
-            const dots = document.querySelectorAll('.carousel-dot');
-            imgs.forEach((img, i) => img.classList.toggle('active', i === currentPhotoIndex));
-            dots.forEach((dot, i) => dot.classList.toggle('active', i === currentPhotoIndex));
-        }
-
-        function goToPhoto(index) {
-            currentPhotoIndex = index;
-            updatePhotos();
-            resetPhotoTimer();
-        }
-
-        function nextPhoto() {
-            if (!photos.length) return;
-            currentPhotoIndex = (currentPhotoIndex + 1) % photos.length;
-            updatePhotos();
-            resetPhotoTimer();
-        }
-
-        function prevPhoto() {
-            if (!photos.length) return;
-            currentPhotoIndex = (currentPhotoIndex - 1 + photos.length) % photos.length;
-            updatePhotos();
-            resetPhotoTimer();
-        }
-
-        function startPhotoTimer() {
-            photoTimer = setInterval(nextPhoto, 5000);
-        }
-
-        function resetPhotoTimer() {
-            clearInterval(photoTimer);
-            startPhotoTimer();
-        }
-
-        // 悬停暂停，离开恢复
-        document.addEventListener('DOMContentLoaded', () => {
-            const carousel = document.getElementById('photoCarousel');
-            if (carousel) {
-                carousel.addEventListener('mouseenter', () => clearInterval(photoTimer));
-                carousel.addEventListener('mouseleave', startPhotoTimer);
-            }
-        });
-
-        // ========== 动态生成月份选项 ==========
-        function generateMonthOptions() {
-            const monthSelect = document.getElementById('monthSelect');
-            const yearSelect = document.getElementById('yearSelect');
-            const selectedYear = yearSelect.value;
-            
-            // 清空现有选项
-            monthSelect.innerHTML = '';
-            
-            // 从数据中获取该年所有月份
-            const yearData = dashboardData.monthly_data[selectedYear];
-            if (!yearData) return;
-            
-            const months = Object.keys(yearData).sort((a, b) => parseInt(a) - parseInt(b));
-            
-            // 找到最后一个有数据的月份
-            let lastMonthWithData = 1;
-            months.forEach(m => {
-                const monthNum = parseInt(m);
-                const total = yearData[m]?.total || 0;
-                if (total > 0) lastMonthWithData = monthNum;
-            });
-            
-            // 生成选项
-            months.forEach(m => {
-                const monthNum = parseInt(m);
-                const option = document.createElement('option');
-                option.value = monthNum;
-                option.textContent = monthNum + '月';
-                // 默认选中最后一个有数据的月份
-                if (monthNum === lastMonthWithData) option.selected = true;
-                monthSelect.appendChild(option);
-            });
-            
-            // 更新当前月份
-            currentMonth = lastMonthWithData;
-        }
-
-        // ========== 手动刷新功能 ==========
-        function refreshData() {
-            const btn = document.querySelector('.refresh-btn');
-            btn.classList.add('loading');
-            btn.querySelector('span:last-child').textContent = '刷新中...';
-            
-            // 刷新页面（强制重新加载）
-            setTimeout(() => {
-                location.reload();
-            }, 300);
-        }
     </script>
 </body>
 </html>
