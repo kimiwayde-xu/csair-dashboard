@@ -1371,7 +1371,7 @@
         }
 
         // ========== Modal 弹窗功能 ==========
-        function showDeptArticles(deptName, targetMonth = null) {
+        function showDeptArticles(deptName, targetMonth = null, filterPlatform = null) {
             if (!articlesData) {
                 console.error('❌ 稿件数据未加载');
                 return;
@@ -1396,31 +1396,58 @@
                     return false;
                 });
             }
+            
+            // 过滤平台（如果指定了平台）
+            if (filterPlatform) {
+                filteredArticles = filteredArticles.filter(article => {
+                    const platform = article.platform || '';
+                    return platform.includes(filterPlatform);
+                });
+            }
 
             // 设置标题
             const monthText = targetMonth ? `${targetMonth}月` : '';
             title.textContent = `${deptName}${monthText} - 稿件详情`;
 
             // 设置数量
-            countDiv.textContent = `共 ${filteredArticles.length} 篇稿件${targetMonth ? `（${targetMonth}月）` : ''}`;
+            const filterText = filterPlatform ? `（筛选: ${filterPlatform}）` : '';
+            countDiv.textContent = `共 ${filteredArticles.length} 篇稿件${targetMonth ? `（${targetMonth}月）` : ''}${filterText}`;
             
-            // 添加平台颜色图例
+            // 统计各平台稿件数
+            const platformStats = {
+                '主流媒体': 0,
+                '内部媒体': 0,
+                '公众号': 0,
+                '行业媒体': 0,
+                '协助宣传': 0
+            };
+            filteredArticles.forEach(article => {
+                const platform = article.platform || '';
+                if (platform.includes('主流媒体')) platformStats['主流媒体']++;
+                else if (platform.includes('内部媒体')) platformStats['内部媒体']++;
+                else if (platform.includes('公众号')) platformStats['公众号']++;
+                else if (platform.includes('行业媒体')) platformStats['行业媒体']++;
+                else if (platform.includes('协助宣传')) platformStats['协助宣传']++;
+            });
+            
+            // 添加平台颜色图例（可点击筛选）
             const legendHTML = `
                 <div style="margin-bottom: 16px; padding: 12px; background: rgba(30, 41, 59, 0.5); border-radius: 8px; border: 1px solid rgba(74, 144, 217, 0.2);">
-                    <div style="font-size: 12px; color: #94a3b8; margin-bottom: 8px;">📊 平台类型图例：</div>
+                    <div style="font-size: 12px; color: #94a3b8; margin-bottom: 8px;">📊 平台类型图例（点击筛选）：</div>
                     <div style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px;">
-                        <span><span style="color: #fbbf24; font-weight: 600;">●</span> 主流媒体</span>
-                        <span><span style="color: #60a5fa; font-weight: 600;">●</span> 内部媒体</span>
-                        <span><span style="color: #34d399; font-weight: 600;">●</span> 公众号</span>
-                        <span><span style="color: #a78bfa; font-weight: 600;">●</span> 行业媒体</span>
-                        <span><span style="color: #f472b6; font-weight: 600;">●</span> 协助宣传</span>
+                        <span class="legend-item ${filterPlatform === '主流媒体' ? 'active' : ''}" onclick="showDeptArticles('${deptName}', ${targetMonth || 'null'}, '主流媒体')" style="cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: all 0.2s; ${filterPlatform === '主流媒体' ? 'background: rgba(251, 191, 36, 0.2);' : ''}" onmouseover="this.style.background='rgba(251, 191, 36, 0.15)'" onmouseout="this.style.background='${filterPlatform === '主流媒体' ? 'rgba(251, 191, 36, 0.2)' : 'transparent'}'"><span style="color: #fbbf24; font-weight: 600;">●</span> 主流媒体 <span style="color: #94a3b8; font-size: 11px;">(${platformStats['主流媒体']})</span></span>
+                        <span class="legend-item ${filterPlatform === '内部媒体' ? 'active' : ''}" onclick="showDeptArticles('${deptName}', ${targetMonth || 'null'}, '内部媒体')" style="cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: all 0.2s; ${filterPlatform === '内部媒体' ? 'background: rgba(96, 165, 250, 0.2);' : ''}" onmouseover="this.style.background='rgba(96, 165, 250, 0.15)'" onmouseout="this.style.background='${filterPlatform === '内部媒体' ? 'rgba(96, 165, 250, 0.2)' : 'transparent'}'"><span style="color: #60a5fa; font-weight: 600;">●</span> 内部媒体 <span style="color: #94a3b8; font-size: 11px;">(${platformStats['内部媒体']})</span></span>
+                        <span class="legend-item ${filterPlatform === '公众号' ? 'active' : ''}" onclick="showDeptArticles('${deptName}', ${targetMonth || 'null'}, '公众号')" style="cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: all 0.2s; ${filterPlatform === '公众号' ? 'background: rgba(52, 211, 153, 0.2);' : ''}" onmouseover="this.style.background='rgba(52, 211, 153, 0.15)'" onmouseout="this.style.background='${filterPlatform === '公众号' ? 'rgba(52, 211, 153, 0.2)' : 'transparent'}'"><span style="color: #34d399; font-weight: 600;">●</span> 公众号 <span style="color: #94a3b8; font-size: 11px;">(${platformStats['公众号']})</span></span>
+                        <span class="legend-item ${filterPlatform === '行业媒体' ? 'active' : ''}" onclick="showDeptArticles('${deptName}', ${targetMonth || 'null'}, '行业媒体')" style="cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: all 0.2s; ${filterPlatform === '行业媒体' ? 'background: rgba(167, 139, 250, 0.2);' : ''}" onmouseover="this.style.background='rgba(167, 139, 250, 0.15)'" onmouseout="this.style.background='${filterPlatform === '行业媒体' ? 'rgba(167, 139, 250, 0.2)' : 'transparent'}'"><span style="color: #a78bfa; font-weight: 600;">●</span> 行业媒体 <span style="color: #94a3b8; font-size: 11px;">(${platformStats['行业媒体']})</span></span>
+                        <span class="legend-item ${filterPlatform === '协助宣传' ? 'active' : ''}" onclick="showDeptArticles('${deptName}', ${targetMonth || 'null'}, '协助宣传')" style="cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: all 0.2s; ${filterPlatform === '协助宣传' ? 'background: rgba(244, 114, 182, 0.2);' : ''}" onmouseover="this.style.background='rgba(244, 114, 182, 0.15)'" onmouseout="this.style.background='${filterPlatform === '协助宣传' ? 'rgba(244, 114, 182, 0.2)' : 'transparent'}'"><span style="color: #f472b6; font-weight: 600;">●</span> 协助宣传 <span style="color: #94a3b8; font-size: 11px;">(${platformStats['协助宣传']})</span></span>
+                        ${filterPlatform ? `<span onclick="showDeptArticles('${deptName}', ${targetMonth || 'null'}, null)" style="cursor: pointer; padding: 4px 8px; border-radius: 6px; color: #94a3b8; font-size: 12px; transition: all 0.2s;" onmouseover="this.style.color='#cbd5e1'" onmouseout="this.style.color='#94a3b8'">✕ 清除筛选</span>` : ''}
                     </div>
                 </div>
             `;
 
             // 生成稿件列表
             if (filteredArticles.length === 0) {
-                listDiv.innerHTML = '<div style="text-align: center; color: #8a9cc2; padding: 20px;">暂无稿件数据</div>';
+                listDiv.innerHTML = legendHTML + '<div style="text-align: center; color: #8a9cc2; padding: 20px;">暂无稿件数据</div>';
             } else {
                 listDiv.innerHTML = legendHTML + filteredArticles.map((article, index) => {
                     const isAssist = article.is_assist;
