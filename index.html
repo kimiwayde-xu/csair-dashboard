@@ -493,6 +493,10 @@
             font-weight: bold;
             margin-left: 8px;
         }
+        .platform-assist {
+            color: #f472b6;
+            font-weight: 500;
+        }
         .modal-footer {
             padding: 16px 24px;
             border-top: 1px solid rgba(74, 144, 217, 0.2);
@@ -1371,7 +1375,7 @@
                             </div>
                             <div class="article-meta">
                                 <span>📅 ${article.date || '未标注'}</span>
-                                <span>📢 ${article.platform || '未标注'}</span>
+                                <span>📢 <span class="${article.platform === '协助宣传' ? 'platform-assist' : ''}">${article.platform || '未标注'}</span></span>
                             </div>
                         </div>
                     `;
