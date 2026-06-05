@@ -721,9 +721,31 @@
             const topColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
             
             const option = {
-                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                tooltip: { 
+                    trigger: 'axis', 
+                    axisPointer: { type: 'shadow' },
+                    formatter: function(params) {
+                        const data = params[0];
+                        return `<div style="font-weight:bold;margin-bottom:4px;">${data.name}</div>
+                                <div style="color:#4a90d9;">📌 ${currentMonth}月稿件数: ${data.value} 篇</div>
+                                <div style="color:#22c55e;font-size:12px;margin-top:4px;">💡 点击查看当月详情</div>`;
+                    }
+                },
                 grid: { left: config.gridLeft, right: config.gridRight, bottom: config.gridBottom, containLabel: true },
-                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: config.axisLabelFontSize, rotate: config.isMobile ? 45 : 20, interval: 0 } },
+                xAxis: { 
+                    type: 'category', 
+                    data: depts, 
+                    axisLabel: { 
+                        color: '#c8d4e8', 
+                        fontSize: config.axisLabelFontSize, 
+                        rotate: config.isMobile ? 45 : 20, 
+                        interval: 0,
+                        formatter: function(value) {
+                            return value + ' 📋';
+                        }
+                    },
+                    triggerEvent: true
+                },
                 yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: config.axisLabelFontSize } },
                 series: [{
                     type: 'bar',
@@ -745,13 +767,33 @@
                         }
                         return {
                             value: v,
-                            itemStyle: { color, borderRadius, shadowBlur: top3.has(i) ? 15 : 0, shadowColor: top3.has(i) ? topColors[sorted.findIndex(x => x.i === i)] : 'transparent' }
+                            itemStyle: { 
+                                color, 
+                                borderRadius, 
+                                shadowBlur: top3.has(i) ? 15 : 0, 
+                                shadowColor: top3.has(i) ? topColors[sorted.findIndex(x => x.i === i)] : 'transparent',
+                                cursor: 'pointer'
+                            }
                         };
                     }),
                     barWidth: '50%',
                     label: { show: true, position: 'top', color: '#fff', fontSize: config.fontSize, fontWeight: 'bold' },
                     animationDelay: (idx) => idx * 50,
-                    animationEasing: 'elasticOut'
+                    animationEasing: 'elasticOut',
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 30,
+                            shadowColor: 'rgba(74, 144, 217, 0.8)',
+                            borderColor: '#4a90d9',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: true,
+                            fontSize: config.fontSize + 2,
+                            color: '#FFD700',
+                            fontWeight: 'bold'
+                        }
+                    }
                 }],
                 animationDuration: 1500
             };
@@ -765,6 +807,18 @@
                     series: [{ label: { fontSize: newConfig.fontSize } }]
                 });
                 chart.resize();
+            });
+            
+            // 点击科室柱状图或坐标轴标签显示当月稿件详情
+            chart.on('click', function(params) {
+                if (params.componentType === 'series') {
+                    const deptName = params.name;
+                    showDeptArticles(deptName, currentMonth);
+                }
+                else if (params.componentType === 'xAxis') {
+                    const deptName = params.value;
+                    showDeptArticles(deptName, currentMonth);
+                }
             });
         }
 
@@ -1268,7 +1322,7 @@
         }
 
         // ========== Modal 弹窗功能 ==========
-        function showDeptArticles(deptName) {
+        function showDeptArticles(deptName, targetMonth = null) {
             if (!articlesData) {
                 console.error('❌ 稿件数据未加载');
                 return;
@@ -1280,17 +1334,32 @@
             const countDiv = document.getElementById('articleCount');
             const listDiv = document.getElementById('articleList');
 
+            // 过滤月份（如果指定了月份）
+            let filteredArticles = articles;
+            if (targetMonth) {
+                filteredArticles = articles.filter(article => {
+                    if (!article.date) return false;
+                    const monthMatch = article.date.match(/^\d{4}-(\d{2})/);
+                    if (monthMatch) {
+                        const articleMonth = parseInt(monthMatch[1]);
+                        return articleMonth === targetMonth;
+                    }
+                    return false;
+                });
+            }
+
             // 设置标题
-            title.textContent = `${deptName} - 稿件详情`;
+            const monthText = targetMonth ? `${targetMonth}月` : '';
+            title.textContent = `${deptName}${monthText} - 稿件详情`;
 
             // 设置数量
-            countDiv.textContent = `共 ${articles.length} 篇稿件`;
+            countDiv.textContent = `共 ${filteredArticles.length} 篇稿件${targetMonth ? `（${targetMonth}月）` : ''}`;
 
             // 生成稿件列表
-            if (articles.length === 0) {
+            if (filteredArticles.length === 0) {
                 listDiv.innerHTML = '<div style="text-align: center; color: #8a9cc2; padding: 20px;">暂无稿件数据</div>';
             } else {
-                listDiv.innerHTML = articles.map((article, index) => {
+                listDiv.innerHTML = filteredArticles.map((article, index) => {
                     const isAssist = article.is_assist;
                     const assistTag = isAssist ? '<span class="assist-tag">协助宣传工作</span>' : '';
                     const itemClass = isAssist ? 'article-item assist-work' : 'article-item';
