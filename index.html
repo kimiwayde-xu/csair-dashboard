@@ -452,12 +452,12 @@
             border-color: rgba(74, 144, 217, 0.3);
             transform: translateY(-1px);
         }
-        /* 日期样式 */
-        .article-meta span:nth-child(1) {
+        /* 日期样式 - 蓝色 */
+        .article-meta span.meta-date {
             color: #60a5fa;
             font-weight: 500;
         }
-        .article-meta span:nth-child(1)::before {
+        .article-meta span.meta-date::before {
             content: '';
             position: absolute;
             left: 0;
@@ -468,12 +468,12 @@
             border-radius: 12px;
             z-index: -1;
         }
-        /* 平台样式 */
-        .article-meta span:nth-child(2) {
+        /* 平台样式 - 绿色 */
+        .article-meta span.meta-platform {
             color: #34d399;
             font-weight: 500;
         }
-        .article-meta span:nth-child(2)::before {
+        .article-meta span.meta-platform::before {
             content: '';
             position: absolute;
             left: 0;
@@ -483,6 +483,31 @@
             background: linear-gradient(135deg, rgba(52, 211, 153, 0.1) 0%, transparent 100%);
             border-radius: 12px;
             z-index: -1;
+        }
+        /* 链接样式 - 紫色 */
+        .article-meta span.meta-link {
+            color: #a78bfa;
+            font-weight: 500;
+        }
+        .article-meta span.meta-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.1) 0%, transparent 100%);
+            border-radius: 12px;
+            z-index: -1;
+        }
+        .article-meta span.meta-link a {
+            color: #a78bfa;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .article-meta span.meta-link a:hover {
+            color: #c4b5fd;
+            text-decoration: underline;
         }
         .assist-tag {
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
@@ -1374,8 +1399,9 @@
                                 ${index + 1}. ${article.title}${assistTag}
                             </div>
                             <div class="article-meta">
-                                <span>📅 ${article.date || '未标注'}</span>
-                                <span>📢 <span class="${article.platform === '协助宣传' ? 'platform-assist' : ''}">${article.platform || '未标注'}</span></span>
+                                <span class="meta-date">📅 ${article.date || '未标注'}</span>
+                                <span class="meta-platform">📢 <span class="${article.platform === '协助宣传' ? 'platform-assist' : ''}">${article.platform || '未标注'}</span></span>
+                                ${article.link ? `<span class="meta-link">🔗 <a href="${article.link}" target="_blank" rel="noopener noreferrer">查看链接</a></span>` : ''}
                             </div>
                         </div>
                     `;
