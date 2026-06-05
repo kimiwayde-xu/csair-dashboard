@@ -469,6 +469,14 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(74, 144, 217, 0.4);
         }
+
+        /* ========== ECharts 图表交互提示样式 ========== */
+        /* 坐标轴标签悬停效果（通过ECharts的axisLabel配置实现） */
+        /* 点击提示tooltip样式 */
+        .echarts-tooltip-content {
+            border: 1px solid rgba(74, 144, 217, 0.3) !important;
+            background: rgba(20, 28, 40, 0.95) !important;
+        }
     </style>
 </head>
 <body>
@@ -731,9 +739,33 @@
             const topColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
             
             const option = {
-                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                tooltip: { 
+                    trigger: 'axis', 
+                    axisPointer: { type: 'shadow' },
+                    formatter: function(params) {
+                        const data = params[0];
+                        return `<div style="font-weight:bold;margin-bottom:4px;">${data.name}</div>
+                                <div style="color:#4a90d9;">📌 稿件数: ${data.value} 篇</div>
+                                <div style="color:#22c55e;font-size:12px;margin-top:4px;">💡 点击查看详情</div>`;
+                    }
+                },
                 grid: { left: config.gridLeft, right: config.gridRight, bottom: config.gridBottom, top: '8%', containLabel: true },
-                xAxis: { type: 'category', data: depts, axisLabel: { color: '#c8d4e8', fontSize: config.axisLabelFontSize, rotate: config.isMobile ? 45 : 20, interval: 0 } },
+                xAxis: { 
+                    type: 'category', 
+                    data: depts, 
+                    axisLabel: { 
+                        color: '#c8d4e8', 
+                        fontSize: config.axisLabelFontSize, 
+                        rotate: config.isMobile ? 45 : 20, 
+                        interval: 0,
+                        formatter: function(value) {
+                            // 添加点击提示标记
+                            return value + ' 📋';
+                        }
+                    },
+                    axisTick: { show: false },
+                    triggerEvent: true  // 启用坐标轴标签点击事件
+                },
                 yAxis: { type: 'value', axisLabel: { color: '#8a9cc2', fontSize: config.axisLabelFontSize } },
                 series: [{
                     type: 'bar',
@@ -757,7 +789,13 @@
                         }
                         return {
                             value: v,
-                            itemStyle: { color, borderRadius: [8, 8, 0, 0], shadowBlur, shadowColor }
+                            itemStyle: { 
+                                color, 
+                                borderRadius: [8, 8, 0, 0], 
+                                shadowBlur, 
+                                shadowColor,
+                                cursor: 'pointer'  // 鼠标样式
+                            }
                         };
                     }),
                     barWidth: '50%',
@@ -777,7 +815,22 @@
                     },
                     animationDuration: 2000,
                     animationDelay: (idx) => idx * 100,
-                    animationEasing: 'elasticOut'
+                    animationEasing: 'elasticOut',
+                    // 悬停动画效果
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 30,
+                            shadowColor: 'rgba(74, 144, 217, 0.8)',
+                            borderColor: '#4a90d9',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: true,
+                            fontSize: config.fontSize + 2,
+                            color: '#FFD700',
+                            fontWeight: 'bold'
+                        }
+                    }
                 }]
             };
             chart.setOption(option);
@@ -829,10 +882,16 @@
             // 页面卸载时清除定时器，避免内存泄漏
             window.addEventListener('beforeunload', () => clearInterval(blinkInterval));
             
-            // 点击科室柱状图显示稿件详情
+            // 点击科室柱状图或坐标轴标签显示稿件详情
             chart.on('click', function(params) {
+                // 点击柱状图
                 if (params.componentType === 'series') {
                     const deptName = params.name;
+                    showDeptArticles(deptName);
+                }
+                // 点击坐标轴标签（科室名称）
+                else if (params.componentType === 'xAxis') {
+                    const deptName = params.value;
                     showDeptArticles(deptName);
                 }
             });
