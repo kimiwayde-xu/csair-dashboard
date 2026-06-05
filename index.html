@@ -439,7 +439,50 @@
         .article-meta span {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
+            padding: 4px 10px;
+            background: rgba(30, 40, 55, 0.6);
+            border-radius: 12px;
+            border: 1px solid rgba(74, 144, 217, 0.15);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .article-meta span:hover {
+            background: rgba(40, 50, 65, 0.8);
+            border-color: rgba(74, 144, 217, 0.3);
+            transform: translateY(-1px);
+        }
+        /* 日期样式 */
+        .article-meta span:nth-child(1) {
+            color: #60a5fa;
+            font-weight: 500;
+        }
+        .article-meta span:nth-child(1)::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(96, 165, 250, 0.1) 0%, transparent 100%);
+            border-radius: 12px;
+            z-index: -1;
+        }
+        /* 平台样式 */
+        .article-meta span:nth-child(2) {
+            color: #34d399;
+            font-weight: 500;
+        }
+        .article-meta span:nth-child(2)::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.1) 0%, transparent 100%);
+            border-radius: 12px;
+            z-index: -1;
         }
         .assist-tag {
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
