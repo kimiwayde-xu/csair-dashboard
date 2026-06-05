@@ -656,20 +656,104 @@
         // ========== 数据定义 ==========
         let dashboardData = null;  // 将通过 fetch 动态加载
 
-        // 加载数据函数
+        // 加载数据函数（版本号检查 + localStorage缓存）
         async function loadData() {
             try {
+                // 1. 先从localStorage读取缓存（快速显示）
+                const cachedData = localStorage.getItem('dashboardData');
+                const cachedVersion = localStorage.getItem('dashboardDataVersion');
+                
+                if (cachedData) {
+                    // 立即显示缓存数据
+                    dashboardData = JSON.parse(cachedData);
+                    console.log('✅ 使用缓存数据:', dashboardData.summary);
+                }
+                
+                // 2. 后台检查更新
                 const response = await fetch('data.json?t=' + Date.now(), { cache: 'no-store' });
                 if (!response.ok) throw new Error('数据加载失败');
-                dashboardData = await response.json();
-                console.log('✅ 数据加载成功:', dashboardData.summary);
+                const newData = await response.json();
+                
+                // 3. 对比版本号（使用总稿件数作为版本标识）
+                const newVersion = `${newData.summary.total_articles}-${newData.summary.monthly_avg}`;
+                
+                if (newVersion !== cachedVersion || !cachedData) {
+                    // 有更新，更新缓存和界面
+                    localStorage.setItem('dashboardData', JSON.stringify(newData));
+                    localStorage.setItem('dashboardDataVersion', newVersion);
+                    dashboardData = newData;
+                    console.log('✅ 数据已更新:', newData.summary);
+                    
+                    // 如果是从缓存更新，需要重新渲染
+                    if (cachedData) {
+                        updateDashboardAfterCache();
+                        showUpdateNotification('📊 数据已更新');
+                    }
+                } else {
+                    console.log('✅ 数据无变化，使用缓存');
+                }
+                
                 return true;
             } catch (error) {
                 console.error('❌ 数据加载错误:', error);
+                
+                // 如果有缓存，即使网络失败也使用缓存
+                if (dashboardData) {
+                    console.log('⚠️ 网络失败，使用缓存数据');
+                    return true;
+                }
+                
                 alert('数据加载错误，请刷新页面重试');
                 return false;
             }
         }
+        
+        // 缓存更新后重新渲染
+        function updateDashboardAfterCache() {
+            updateMonthSelector();
+            updateDashboard();
+        }
+        
+        // 显示更新通知
+        function showUpdateNotification(message) {
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 10000;
+                font-size: 14px;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // 3秒后自动消失
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // 添加动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
 
         let currentYear = 2026;
         let currentMonth = 5;
@@ -1355,17 +1439,47 @@
     </div>
 
     <script>
-        // ========== articles.json 预加载 ==========
+        // ========== articles.json 预加载（版本号检查 + localStorage缓存） ==========
         let articlesData = null;
 
         async function loadArticles() {
-            if (articlesData) return;
+            // 1. 先从localStorage读取缓存
+            const cachedArticles = localStorage.getItem('articlesData');
+            const cachedVersion = localStorage.getItem('articlesDataVersion');
+            
+            if (cachedArticles && !articlesData) {
+                // 立即使用缓存数据
+                articlesData = JSON.parse(cachedArticles);
+                console.log('✅ 使用缓存的稿件数据');
+            }
+            
+            // 2. 后台检查更新
             try {
                 const response = await fetch('articles.json?t=' + Date.now(), { cache: 'no-store' });
-                articlesData = await response.json();
-                console.log('✅ articles.json 加载成功');
+                const newArticles = await response.json();
+                
+                // 3. 计算版本号（使用总稿件数）
+                const totalArticles = Object.values(newArticles).reduce((sum, arr) => sum + arr.length, 0);
+                const newVersion = `${totalArticles}`;
+                
+                if (newVersion !== cachedVersion || !cachedArticles) {
+                    // 有更新，更新缓存
+                    localStorage.setItem('articlesData', JSON.stringify(newArticles));
+                    localStorage.setItem('articlesDataVersion', newVersion);
+                    articlesData = newArticles;
+                    console.log('✅ 稿件数据已更新:', totalArticles, '篇');
+                } else {
+                    console.log('✅ 稿件数据无变化');
+                }
             } catch (error) {
                 console.error('❌ 加载稿件数据失败:', error);
+                
+                // 如果有缓存，即使网络失败也使用缓存
+                if (articlesData) {
+                    console.log('⚠️ 网络失败，使用缓存稿件数据');
+                    return;
+                }
+                
                 articlesData = {};
             }
         }
