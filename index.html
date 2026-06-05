@@ -468,7 +468,7 @@
             border-radius: 12px;
             z-index: -1;
         }
-        /* 平台样式 - 绿色 */
+        /* 平台样式 - 默认绿色 */
         .article-meta span.meta-platform {
             color: #34d399;
             font-weight: 500;
@@ -483,6 +483,26 @@
             background: linear-gradient(135deg, rgba(52, 211, 153, 0.1) 0%, transparent 100%);
             border-radius: 12px;
             z-index: -1;
+        }
+        
+        /* 平台颜色区分 */
+        .platform-mainstream {
+            color: #fbbf24 !important;  /* 主流媒体 - 金色 */
+        }
+        .platform-internal {
+            color: #60a5fa !important;  /* 内部媒体 - 蓝色 */
+        }
+        .platform-wechat {
+            color: #34d399 !important;  /* 公众号 - 绿色 */
+        }
+        .platform-industry {
+            color: #a78bfa !important;  /* 行业媒体 - 紫色 */
+        }
+        .platform-assist {
+            color: #f472b6 !important;  /* 协助宣传 - 粉色 */
+        }
+        .platform-default {
+            color: #94a3b8 !important;  /* 其他平台 - 灰色 */
         }
         /* 链接样式 - 紫色 */
         .article-meta span.meta-link {
@@ -1383,15 +1403,44 @@
 
             // 设置数量
             countDiv.textContent = `共 ${filteredArticles.length} 篇稿件${targetMonth ? `（${targetMonth}月）` : ''}`;
+            
+            // 添加平台颜色图例
+            const legendHTML = `
+                <div style="margin-bottom: 16px; padding: 12px; background: rgba(30, 41, 59, 0.5); border-radius: 8px; border: 1px solid rgba(74, 144, 217, 0.2);">
+                    <div style="font-size: 12px; color: #94a3b8; margin-bottom: 8px;">📊 平台类型图例：</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px;">
+                        <span><span style="color: #fbbf24; font-weight: 600;">●</span> 主流媒体</span>
+                        <span><span style="color: #60a5fa; font-weight: 600;">●</span> 内部媒体</span>
+                        <span><span style="color: #34d399; font-weight: 600;">●</span> 公众号</span>
+                        <span><span style="color: #a78bfa; font-weight: 600;">●</span> 行业媒体</span>
+                        <span><span style="color: #f472b6; font-weight: 600;">●</span> 协助宣传</span>
+                    </div>
+                </div>
+            `;
 
             // 生成稿件列表
             if (filteredArticles.length === 0) {
                 listDiv.innerHTML = '<div style="text-align: center; color: #8a9cc2; padding: 20px;">暂无稿件数据</div>';
             } else {
-                listDiv.innerHTML = filteredArticles.map((article, index) => {
+                listDiv.innerHTML = legendHTML + filteredArticles.map((article, index) => {
                     const isAssist = article.is_assist;
                     const assistTag = isAssist ? '<span class="assist-tag">协助宣传工作</span>' : '';
                     const itemClass = isAssist ? 'article-item assist-work' : 'article-item';
+                    
+                    // 根据平台设置不同的CSS类
+                    let platformClass = 'platform-default';
+                    const platform = article.platform || '';
+                    if (platform.includes('主流媒体')) {
+                        platformClass = 'platform-mainstream';
+                    } else if (platform.includes('内部媒体')) {
+                        platformClass = 'platform-internal';
+                    } else if (platform.includes('公众号')) {
+                        platformClass = 'platform-wechat';
+                    } else if (platform.includes('行业媒体')) {
+                        platformClass = 'platform-industry';
+                    } else if (platform.includes('协助宣传')) {
+                        platformClass = 'platform-assist';
+                    }
                     
                     return `
                         <div class="${itemClass}">
@@ -1400,7 +1449,7 @@
                             </div>
                             <div class="article-meta">
                                 <span class="meta-date">📅 ${article.date || '未标注'}</span>
-                                <span class="meta-platform">📢 <span class="${article.platform === '协助宣传' ? 'platform-assist' : ''}">${article.platform || '未标注'}</span></span>
+                                <span class="meta-platform">📢 <span class="${platformClass}">${article.platform || '未标注'}</span></span>
                                 ${article.link ? `<span class="meta-link">🔗 <a href="${article.link}" target="_blank" rel="noopener noreferrer">查看链接</a></span>` : ''}
                             </div>
                         </div>
