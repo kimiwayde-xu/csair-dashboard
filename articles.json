@@ -456,7 +456,7 @@
       "link": "https://mp.weixin.qq.com/s/Xs48ykionFtObnTKwjHmNg?scene=1"
     },
     {
-      "title": "春运航班启航,欢迎登机!",
+      "title": "旅客术后行走不便 地服小哥护送登机",
       "platform": "内部媒体",
       "date": "2026-02-03"
     },
@@ -1767,7 +1767,7 @@
     },
     {
       "title": "11位乘坐轮椅的旅客搭乘南航CZ3586航班",
-      "platform": "协助宣传",
+      "platform": "主流媒体",
       "date": "2026-05-17",
       "link": "https://m.weibo.cn/status/5299514836781190"
     },
@@ -1776,6 +1776,11 @@
       "platform": "公众号",
       "date": "2026-05-29",
       "link": "https://mp.weixin.qq.com/s/vyTasTbGyxx2oUiFGJporA"
+    },
+    {
+      "title": "我与南航共奋进——守好登机口“最后一百米”",
+      "platform": "内部媒体",
+      "date": "2026-06-05"
     }
   ],
   "客机保障室": [
@@ -1961,11 +1966,6 @@
   ],
   "货机保障室": [
     {
-      "title": "2025年度小结",
-      "platform": "内部媒体",
-      "date": "2026-01-04"
-    },
-    {
       "title": "上海分公司“智慧派工”项目荣获第四届南航创新挑战赛一等奖",
       "platform": "公众号",
       "date": "2026-01-06",
@@ -2085,11 +2085,6 @@
     }
   ],
   "运行管理室": [
-    {
-      "title": "2025年度小结",
-      "platform": "内部媒体",
-      "date": "2026-01-04"
-    },
     {
       "title": "增投运力保畅通 温嗳旅客回家路",
       "platform": "内部媒体",
