@@ -11,8 +11,18 @@ import sys
 import re
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
-import cgi
 from datetime import datetime
+from email.message import EmailMessage
+import io
+
+# cgi module removed in Python 3.13, use fallback
+HAS_CGI = False
+try:
+    from cgi import FieldStorage as _CgiFieldStorage
+    from cgi import parse_header as _parse_header
+    HAS_CGI = True
+except ImportError:
+    pass
 
 try:
     from openpyxl import load_workbook
@@ -72,42 +82,99 @@ class UploadHandler(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def parse_multipart_body(self):
+        """手动解析 multipart/form-data（不依赖已移除的 cgi 模块）"""
+        content_type = self.headers.get('Content-Type', '')
+        boundary = None
+        for part in content_type.split(';'):
+            part = part.strip()
+            if part.startswith('boundary='):
+                boundary = part[9:].strip('"')
+                break
+        if not boundary:
+            return None
+
+        content_length = int(self.headers.get('Content-Length', 0))
+        raw = self.rfile.read(content_length)
+        boundary_bytes = f'--{boundary}'.encode()
+        end_boundary = f'--{boundary}--'.encode()
+
+        parts = raw.split(boundary_bytes)
+        for part in parts:
+            if part in (b'', b'\r\n', b'--\r\n') or part.startswith(end_boundary):
+                continue
+
+            # 分离头部与正文
+            header_end = part.find(b'\r\n\r\n')
+            if header_end == -1:
+                continue
+            header_bytes = part[:header_end]
+            body = part[header_end+4:].rstrip(b'\r\n')
+
+            headers = {}
+            for hdr_line in header_bytes.decode('utf-8', errors='replace').split('\r\n'):
+                if ':' in hdr_line:
+                    key, val = hdr_line.split(':', 1)
+                    headers[key.strip().lower()] = val.strip()
+
+            disp = headers.get('content-disposition', '')
+            if 'name="file"' in disp:
+                filename = None
+                for seg in disp.split(';'):
+                    seg = seg.strip()
+                    if seg.startswith('filename='):
+                        filename = seg[9:].strip('"')
+                        break
+                return {'filename': filename, 'body': body}
+        return None
+
     def handle_upload(self):
-        content_type, _ = cgi.parse_header(self.headers['Content-Type'])
-        if content_type != 'multipart/form-data':
+        # 解析 Content-Type
+        ct = self.headers.get('Content-Type', '')
+        if 'multipart/form-data' not in ct:
             self.send_error(400, 'Expected multipart/form-data')
             return
 
-        form = cgi.FieldStorage(
-            fp=self.rfile,
-            headers=self.headers,
-            environ={'REQUEST_METHOD': 'POST'}
-        )
-
-        if 'file' not in form:
-            self.send_error(400, 'No file uploaded')
-            return
-
-        file_item = form['file']
-        if not file_item.filename:
-            self.send_error(400, 'Empty file')
-            return
-
         upload_path = WORKSPACE / 'uploaded.xlsx'
-        with open(upload_path, 'wb') as f:
-            f.write(file_item.file.read())
+        filename = ''
+
+        if HAS_CGI:
+            # Python <3.13: 使用 cgi 模块
+            form = _CgiFieldStorage(
+                fp=self.rfile,
+                headers=self.headers,
+                environ={'REQUEST_METHOD': 'POST'}
+            )
+            if 'file' not in form:
+                self.send_error(400, 'No file uploaded')
+                return
+            file_item = form['file']
+            if not file_item.filename:
+                self.send_error(400, 'Empty file')
+                return
+            filename = file_item.filename
+            with open(upload_path, 'wb') as f:
+                f.write(file_item.file.read())
+        else:
+            # Python >=3.13: 手动解析 multipart
+            parsed = self.parse_multipart_body()
+            if not parsed or not parsed['body']:
+                self.send_error(400, 'No file uploaded')
+                return
+            filename = parsed['filename'] or 'uploaded.xlsx'
+            with open(upload_path, 'wb') as f:
+                f.write(parsed['body'])
 
         try:
             data = parse_excel(upload_path)
 
-            json_path = WORKSPACE / 'data' / 'dashboard_data.json'
-            json_path.parent.mkdir(exist_ok=True)
+            json_path = DEPLOY_DIR / 'data.json'
             with open(json_path, 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
 
             self.send_json({
                 'success': True,
-                'message': f'解析成功：{file_item.filename}',
+                'message': f'解析成功：{filename}',
                 'summary': data.get('summary', {}),
             })
         except Exception as e:

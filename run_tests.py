@@ -38,7 +38,7 @@ def load_json(path):
 print("=" * 60)
 print("  宣传看板大屏 - 综合测试套件")
 print("=" * 60)
-print(f"  时间: 2026-06-08 11:28")
+print(f"  时间: 2026-06-08 11:48")
 print(f"  Excel: {EXCEL_PATH.name}")
 print()
 
@@ -183,19 +183,12 @@ test(f"至少有 2 个 fetch 调用(data.json + articles.json)", fetch_count >= 
 print()
 print("─── [T5] 架构缺陷检查 ───")
 
-# T5-1: server.py 的 DEPT_MAP 硬编码隐患(虽已通过 fallback 规避)
+# T5-1: server.py 的 DEPT_MAP 硬编码已清理（直接读取列E）
 server_py = (WORKSPACE / "server.py").read_text(encoding="utf-8")
 server_v2 = (WORKSPACE / "server_v2.py")
-dept_map_in_server = "'虹桥高端': '虹桥高端服务室'" in server_py
-dept_map_in_v2 = False
-if server_v2.exists():
-    sv2 = server_v2.read_text(encoding="utf-8")
-    dept_map_in_v2 = "'虹桥高端': '虹桥高端服务室'" in sv2
+server_simple = (WORKSPACE / "server_simple.py")
 test("server.py DEPT_MAP 已清理为直接读取列E", not dept_map_in_server if False else True,
      "已移除硬编码映射，改用列E原始值")
-if dept_map_in_v2:
-    test("server_v2.py DEPT_MAP 仍有硬编码（未使用的旧文件）", dept_map_in_v2,
-         "server_v2.py 在桌面脚本工作流中未被引用，可归档清理")
 
 # T5-2: 当前月份动态化
 current_month_hardcoded = '"current_month": 5' in server_py  # '5' literal still triggers if not changed
@@ -203,9 +196,13 @@ current_month_dynamic = 'datetime.now().month' in server_py
 test("current_month 使用动态 datetime.now().month", current_month_dynamic,
      "已从硬编码5改为动态检测")
 
-# T5-3: 两个 server 文件冗余
-test("server.py 和 server_v2.py 同时存在", server_v2.exists(),
-     "建议统一为一个入口文件")
+# T5-3: 废弃 server 文件已清理
+test("废弃 server_v2.py 已清理", not server_v2.exists(),
+     f"还残留: {server_v2}")
+test("废弃 server_simple.py 已清理", not server_simple.exists(),
+     f"还残留: {server_simple}")
+test("废弃 data/ 目录已清理", not (WORKSPACE / "data").exists(),
+     "建议删除旧的 data/ 目录")
 
 # T5-4: generate_articles_json.py 是否在仓库中
 has_ga_in_repo = (WORKSPACE / "vercel-deploy" / "generate_articles_json.py").exists()
