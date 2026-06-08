@@ -1536,7 +1536,10 @@
 
         // ========== 页面加载完成后初始化 ==========
         window.addEventListener('DOMContentLoaded', async () => {
-            // 先加载数据
+            // 先加载稿件数据（确保图表点击时可查）
+            await loadArticles();
+            
+            // 再加载看板数据
             const loaded = await loadData();
             if (!loaded) return;
             
@@ -1751,7 +1754,15 @@
                 return;
             }
 
-            const articles = articlesData[deptName] || [];
+            // 科室名称映射（图表名 → articles.json键名）
+            const DEPT_NAME_MAP = {
+                '虹桥值机室': '虹桥值机',
+                '虹桥高端客服室': '虹桥高端服务室',
+                '浦东高端客服室': '浦东高端服务室'
+            };
+            const articleKey = DEPT_NAME_MAP[deptName] || deptName;
+
+            const articles = articlesData[articleKey] || [];
             const modal = document.getElementById('articleModal');
             const title = document.getElementById('modalTitle');
             const countDiv = document.getElementById('articleCount');
@@ -1881,11 +1892,6 @@
             if (e.key === 'Escape') {
                 closeModal();
             }
-        });
-
-        // ========== 页面加载时预加载 articles.json ==========
-        window.addEventListener('DOMContentLoaded', async () => {
-            await loadArticles();
         });
     </script>
     </div><!-- /content-wrapper -->
