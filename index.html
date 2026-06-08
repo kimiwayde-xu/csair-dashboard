@@ -1016,7 +1016,7 @@
         document.head.appendChild(style);
 
         let currentYear = 2026;
-        let currentMonth = 5;
+        let currentMonth = 0;  // 哨兵值，generateMonthOptions() 会自动检测最后有数据的月份并覆盖此值
 
         // ========== 响应式工具函数 ==========
         function getResponsiveConfig() {

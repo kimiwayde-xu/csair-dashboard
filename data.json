@@ -738,12 +738,12 @@
     "monthly_avg": 9.0,
     "current_month_articles": 12,
     "current_year": 2026,
-    "current_month": 5
+    "current_month": 6
   },
   "current_month_platform": {
-    "主流媒体": 4,
-    "内部媒体": 4,
-    "公众号": 4
+    "内部媒体": 3,
+    "公众号": 3,
+    "主流媒体": 6
   },
   "department_yoy": {
     "1月": [
