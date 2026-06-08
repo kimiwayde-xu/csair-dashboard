@@ -137,9 +137,17 @@ class UploadHandler(SimpleHTTPRequestHandler):
                     capture_output=True, text=True, cwd=WORKSPACE
                 )
 
+            # 3. 刷新照片列表
+            photo_script = WORKSPACE / 'generate_photos_json.py'
+            if photo_script.exists():
+                result = subprocess.run(
+                    [sys.executable, str(photo_script)],
+                    capture_output=True, text=True, cwd=WORKSPACE
+                )
+
             # 3. Git提交推送
             os.chdir(DEPLOY_DIR)
-            git_files = ['data.json', 'articles.json']
+            git_files = ['data.json', 'articles.json', 'photos.json', 'photos/']
             subprocess.run(['git', 'add'] + git_files, check=True, capture_output=True)
             subprocess.run(
                 ['git', 'commit', '-m', f'update: 宣传看板数据更新 {datetime.now().strftime("%Y-%m-%d %H:%M")}'],
