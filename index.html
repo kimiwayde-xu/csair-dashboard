@@ -569,9 +569,244 @@
             border: 1px solid rgba(74, 144, 217, 0.3) !important;
             background: rgba(20, 28, 40, 0.95) !important;
         }
+
+        /* ========== 骨架屏样式 ========== */
+        .skeleton-wrapper {
+            opacity: 1;
+            transition: opacity 0.3s ease-out;
+        }
+        .skeleton-wrapper.hidden {
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+        }
+        .content-wrapper {
+            opacity: 0;
+            transition: opacity 0.3s ease-in;
+        }
+        .content-wrapper.visible {
+            opacity: 1;
+        }
+        .skeleton-header {
+            background: linear-gradient(90deg, #1a2d4a 0%, #3d6b99 50%, #1a2d4a 100%);
+            padding: 25px 40px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(74, 144, 217, 0.2);
+        }
+        .skeleton-title {
+            width: 400px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-datetime {
+            width: 200px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-controls {
+            background: rgba(26, 45, 74, 0.6);
+            padding: 18px 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 30px;
+        }
+        .skeleton-select {
+            width: 150px;
+            height: 42px;
+            background: rgba(20, 28, 40, 0.8);
+            border: 1px solid rgba(74, 144, 217, 0.3);
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-button {
+            width: 120px;
+            height: 42px;
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8a 100%);
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .skeleton-card {
+            background: rgba(26, 45, 74, 0.6);
+            border: 1px solid rgba(74, 144, 217, 0.2);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-label {
+            width: 60%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-value {
+            width: 40%;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        .skeleton-chart-card {
+            background: rgba(26, 45, 74, 0.6);
+            border: 1px solid rgba(74, 144, 217, 0.2);
+            border-radius: 12px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-chart-title {
+            width: 50%;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-chart {
+            height: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        .skeleton-title::after,
+        .skeleton-datetime::after,
+        .skeleton-select::after,
+        .skeleton-button::after,
+        .skeleton-label::after,
+        .skeleton-value::after,
+        .skeleton-chart-title::after,
+        .skeleton-chart::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.15) 50%,
+                transparent 100%
+            );
+            animation: skeleton-wave 1.5s infinite;
+        }
+        @keyframes skeleton-wave {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        @media (max-width: 575px) {
+            .skeleton-metrics, .skeleton-dashboard {
+                grid-template-columns: 1fr;
+            }
+            .skeleton-title { width: 80%; height: 32px; }
+            .skeleton-datetime { width: 120px; height: 20px; }
+        }
+        @media (min-width: 576px) and (max-width: 991px) {
+            .skeleton-metrics, .skeleton-dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (min-width: 992px) and (max-width: 1199px) {
+            .skeleton-metrics { grid-template-columns: repeat(2, 1fr); }
+            .skeleton-dashboard { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (min-width: 1200px) and (max-width: 1400px) {
+            .skeleton-metrics { grid-template-columns: repeat(4, 1fr); }
+            .skeleton-dashboard { grid-template-columns: repeat(3, 1fr); }
+        }
     </style>
 </head>
 <body>
+    <!-- ========== 骨架屏 ========== -->
+    <div id="skeleton" class="skeleton-wrapper">
+        <div class="skeleton-header">
+            <div class="skeleton-title"></div>
+            <div class="skeleton-datetime"></div>
+        </div>
+        <div class="skeleton-controls">
+            <div class="skeleton-select"></div>
+            <div class="skeleton-select"></div>
+            <div class="skeleton-button"></div>
+        </div>
+        <div class="skeleton-metrics">
+            <div class="skeleton-card">
+                <div class="skeleton-label"></div>
+                <div class="skeleton-value"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-label"></div>
+                <div class="skeleton-value"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-label"></div>
+                <div class="skeleton-value"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-label"></div>
+                <div class="skeleton-value"></div>
+            </div>
+        </div>
+        <div class="skeleton-dashboard">
+            <div class="skeleton-chart-card">
+                <div class="skeleton-chart-title"></div>
+                <div class="skeleton-chart"></div>
+            </div>
+            <div class="skeleton-chart-card">
+                <div class="skeleton-chart-title"></div>
+                <div class="skeleton-chart"></div>
+            </div>
+            <div class="skeleton-chart-card">
+                <div class="skeleton-chart-title"></div>
+                <div class="skeleton-chart"></div>
+            </div>
+            <div class="skeleton-chart-card">
+                <div class="skeleton-chart-title"></div>
+                <div class="skeleton-chart"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 真实内容 ========== -->
+    <div id="content" class="content-wrapper" style="display: none;">
     <div class="header">
         <h1>✈️ 2026年地服部宣传数据可视化看板</h1>
         <div id="datetime"></div>
@@ -664,9 +899,11 @@
                 const cachedVersion = localStorage.getItem('dashboardDataVersion');
                 
                 if (cachedData) {
-                    // 立即显示缓存数据
+                    // 立即显示缓存数据（隐藏骨架屏）
                     dashboardData = JSON.parse(cachedData);
                     console.log('✅ 使用缓存数据:', dashboardData.summary);
+                    hideSkeleton();
+                    showContent();
                 }
                 
                 // 2. 后台检查更新
@@ -688,6 +925,10 @@
                     if (cachedData) {
                         updateDashboardAfterCache();
                         showUpdateNotification('📊 数据已更新');
+                    } else {
+                        // 首次加载，隐藏骨架屏
+                        hideSkeleton();
+                        showContent();
                     }
                 } else {
                     console.log('✅ 数据无变化，使用缓存');
@@ -705,6 +946,25 @@
                 
                 alert('数据加载错误，请刷新页面重试');
                 return false;
+            }
+        }
+        
+        // 隐藏骨架屏
+        function hideSkeleton() {
+            const skeleton = document.getElementById('skeleton');
+            if (skeleton) {
+                skeleton.classList.add('hidden');
+            }
+        }
+        
+        // 显示内容
+        function showContent() {
+            const content = document.getElementById('content');
+            if (content) {
+                content.style.display = 'block';
+                setTimeout(() => {
+                    content.classList.add('visible');
+                }, 10);
             }
         }
         
@@ -1628,5 +1888,6 @@
             await loadArticles();
         });
     </script>
+    </div><!-- /content-wrapper -->
 </body>
 </html>
