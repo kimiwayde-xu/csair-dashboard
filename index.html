@@ -1754,12 +1754,9 @@
                 return;
             }
 
-            // 科室名称映射（图表名 → articles.json键名）
-            const DEPT_NAME_MAP = {
-                '虹桥值机室': '虹桥值机',
-                '虹桥高端客服室': '虹桥高端服务室',
-                '浦东高端客服室': '浦东高端服务室'
-            };
+            // 科室名称映射 2026-06-08: 已废弃，articles.json与data.json键名已完全一致
+            // 保留映射表作为兜底，避免意外
+            const DEPT_NAME_MAP = {};
             const articleKey = DEPT_NAME_MAP[deptName] || deptName;
 
             const articles = articlesData[articleKey] || [];
