@@ -1,6 +1,14 @@
 {
-  "total": 25,
+  "total": 26,
   "photos": [
+    {
+      "filename": "a9f0dc99035fea57a760e9d951ac8bed.jpg",
+      "path": "photos/a9f0dc99035fea57a760e9d951ac8bed.jpg",
+      "title": "a9f0dc99035fea57a760e9d951ac8bed",
+      "description": "",
+      "size": 308828,
+      "modified": "1782194272.0381033"
+    },
     {
       "filename": "微信图片_20260616150500_101_48.jpg",
       "path": "photos/微信图片_20260616150500_101_48.jpg",
