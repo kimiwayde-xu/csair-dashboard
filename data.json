@@ -10,15 +10,15 @@
     "values": [
       41,
       8,
-      64,
+      67,
       20,
       0
     ],
     "percentages": [
-      30.8,
-      6.0,
-      48.1,
-      15.0
+      30.1,
+      5.9,
+      49.3,
+      14.7
     ]
   },
   "department_stats": {
@@ -412,7 +412,9 @@
           0,
           0
         ],
-        "platform": {}
+        "platform": {
+          "主流媒体": 3
+        }
       },
       "8月": {
         "total": 0,
@@ -735,11 +737,11 @@
     }
   },
   "summary": {
-    "total_articles": 133,
-    "monthly_avg": 11.08,
+    "total_articles": 136,
+    "monthly_avg": 11.33,
     "current_month_articles": 37,
     "current_year": 2026,
-    "current_month": 6
+    "current_month": 7
   },
   "department_yoy": {
     "1月": [
@@ -961,7 +963,9 @@
       "主流媒体": 25,
       "行业媒体": 4
     },
-    "7": {},
+    "7": {
+      "主流媒体": 3
+    },
     "8": {},
     "9": {},
     "10": {},
