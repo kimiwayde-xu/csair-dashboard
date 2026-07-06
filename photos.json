@@ -1,6 +1,30 @@
 {
-  "total": 26,
+  "total": 29,
   "photos": [
+    {
+      "filename": "微信图片_20260706101432_670_95.jpg",
+      "path": "photos/微信图片_20260706101432_670_95.jpg",
+      "title": "微信图片_20260706101432_670_95",
+      "description": "",
+      "size": 166207,
+      "modified": "1783304452.46"
+    },
+    {
+      "filename": "微信图片_20260706101432_672_95.jpg",
+      "path": "photos/微信图片_20260706101432_672_95.jpg",
+      "title": "微信图片_20260706101432_672_95",
+      "description": "",
+      "size": 404003,
+      "modified": "1783304452.45"
+    },
+    {
+      "filename": "微信图片_20260706101432_671_95.jpg",
+      "path": "photos/微信图片_20260706101432_671_95.jpg",
+      "title": "微信图片_20260706101432_671_95",
+      "description": "",
+      "size": 323119,
+      "modified": "1783304452.45"
+    },
     {
       "filename": "a9f0dc99035fea57a760e9d951ac8bed.jpg",
       "path": "photos/a9f0dc99035fea57a760e9d951ac8bed.jpg",
