@@ -8,17 +8,17 @@
       "视频号"
     ],
     "values": [
-      49,
+      50,
       14,
       140,
       33,
       0
     ],
     "percentages": [
-      20.8,
+      21.1,
       5.9,
-      59.3,
-      14.0
+      59.1,
+      13.9
     ]
   },
   "department_stats": {
@@ -458,7 +458,9 @@
           0,
           0
         ],
-        "platform": {}
+        "platform": {
+          "内部媒体": 1
+        }
       },
       "10月": {
         "total": 0,
@@ -745,8 +747,8 @@
     }
   },
   "summary": {
-    "total_articles": 236,
-    "monthly_avg": 19.67,
+    "total_articles": 237,
+    "monthly_avg": 19.75,
     "current_month_articles": 38,
     "current_year": 2026,
     "current_month": 9
@@ -983,7 +985,9 @@
       "行业媒体": 3,
       "公众号": 8
     },
-    "9": {},
+    "9": {
+      "内部媒体": 1
+    },
     "10": {},
     "11": {},
     "12": {}
