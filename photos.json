@@ -1,6 +1,14 @@
 {
-  "total": 38,
+  "total": 39,
   "photos": [
+    {
+      "filename": "8a26a0bda40c0f56ce82d03d4d15cb9d.jpg",
+      "path": "photos/8a26a0bda40c0f56ce82d03d4d15cb9d.jpg",
+      "title": "8a26a0bda40c0f56ce82d03d4d15cb9d",
+      "description": "",
+      "size": 744576,
+      "modified": "1788312636.1442504"
+    },
     {
       "filename": "e24e70a8d60618d06bbd680d7af0e184.png",
       "path": "photos/e24e70a8d60618d06bbd680d7af0e184.png",
