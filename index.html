@@ -911,8 +911,12 @@
                 if (!response.ok) throw new Error('数据加载失败');
                 const newData = await response.json();
                 
-                // 3. 对比版本号（使用总稿件数作为版本标识）
-                const newVersion = `${newData.summary.total_articles}-${newData.summary.monthly_avg}`;
+                // 3. 对比版本号
+                // 版本号用"总稿件数 + 各月稿件量拼接"，确保任何月度数据变化都能触发更新
+                // （旧方案只用 total-monthly_avg，9月0→2但总数不变时版本号不变 → 缓存永不更新 Bug）
+                const monthlyTotals = Object.values(newData.monthly_data['2026'] || {})
+                    .map(m => m.total || 0).join('-');
+                const newVersion = `${newData.summary.total_articles}-${monthlyTotals}`;
                 
                 if (newVersion !== cachedVersion || !cachedData) {
                     // 有更新，更新缓存和界面
@@ -1726,9 +1730,10 @@
                 const response = await fetch('articles.json?t=' + Date.now(), { cache: 'no-store' });
                 const newArticles = await response.json();
                 
-                // 3. 计算版本号（使用总稿件数）
+                // 3. 计算版本号（总稿件数 + 最新稿件日期，避免新增稿件时总数不变导致缓存不更新）
                 const totalArticles = Object.values(newArticles).reduce((sum, arr) => sum + arr.length, 0);
-                const newVersion = `${totalArticles}`;
+                const validDates = Object.values(newArticles).flat().map(a => String(a.date || '')).filter(dt => /^\d{4}-\d{2}-\d{2}$/.test(dt)).sort();
+                const newVersion = `${totalArticles}-${validDates[validDates.length - 1] || 'none'}`;
                 
                 if (newVersion !== cachedVersion || !cachedArticles) {
                     // 有更新，更新缓存
