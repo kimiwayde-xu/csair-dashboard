@@ -1049,7 +1049,8 @@
 
         // ========== 1. 平台分布饼图 ==========
         function initPlatformChart() {
-            const chart = echarts.init(document.getElementById('platformChart'));
+            const dom = document.getElementById('platformChart');
+            const chart = echarts.getInstanceByDom(dom) || echarts.init(dom);
             const d = dashboardData.platform_distribution;
             const config = getResponsiveConfig();
             const option = {
@@ -1097,7 +1098,8 @@
 
         // ========== 2. 月度科室排名（前三名高亮）==========
         function initMonthlyDeptChart() {
-            const chart = echarts.init(document.getElementById('monthlyDeptChart'));
+            const dom = document.getElementById('monthlyDeptChart');
+            const chart = echarts.getInstanceByDom(dom) || echarts.init(dom);
             const monthName = currentMonth + '月';
             const monthData = dashboardData.monthly_data[currentYear]?.[monthName];
             if (!monthData) return;
@@ -1217,7 +1219,8 @@
 
         // ========== 3. 全年科室排名（动画+前三高亮）==========
         function initYearlyDeptChart() {
-            const chart = echarts.init(document.getElementById('yearlyDeptChart'));
+            const dom = document.getElementById('yearlyDeptChart');
+            const chart = echarts.getInstanceByDom(dom) || echarts.init(dom);
             const deptData = dashboardData.department_stats;
             const depts = deptData.departments;
             const values = deptData.values;
@@ -1389,7 +1392,8 @@
 
         // ========== 4. 月度趋势对比 ==========
         function initMonthlyChart() {
-            const chart = echarts.init(document.getElementById('monthlyChart'));
+            const dom = document.getElementById('monthlyChart');
+            const chart = echarts.getInstanceByDom(dom) || echarts.init(dom);
             const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
             const data2025 = months.map(m => dashboardData.monthly_data['2025']?.[m]?.total || 0);
             const data2026 = months.map(m => dashboardData.monthly_data['2026']?.[m]?.total || 0);
@@ -1446,7 +1450,8 @@
 
         // ========== 5. 科室同比 ==========
         function initDeptYoyChart() {
-            const chart = echarts.init(document.getElementById('deptYoyChart'));
+            const dom = document.getElementById('deptYoyChart');
+            const chart = echarts.getInstanceByDom(dom) || echarts.init(dom);
             const monthName = currentMonth + '月';
             const yoyValues = dashboardData.department_yoy?.[monthName] || [];
             const depts = dashboardData.department_stats?.departments || [];
