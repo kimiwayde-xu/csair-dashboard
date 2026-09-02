@@ -970,7 +970,7 @@
         
         // 缓存更新后重新渲染
         function updateDashboardAfterCache() {
-            updateMonthSelector();
+            generateMonthOptions(); // 重新生成月份选项（会更新currentMonth为最新有数据月份）
             updateDashboard();
         }
         
